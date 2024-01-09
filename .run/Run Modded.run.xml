@@ -1,6 +1,6 @@
 ﻿<component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run Modded" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="Copy-Item &quot;bin\Debug\netstandard2.1\VirtualOrc.dll&quot; &quot;..\Orc Massage\BepInEx\plugins\VirtualOrc.dll&quot; -force; Start-Process &quot;..\Orc Massage\OrcMassage.exe&quot;" />
+    <option name="SCRIPT_TEXT" value="Copy-Item &quot;bin\Debug\netstandard2.1\VirtualOrc.dll&quot; &quot;$env:ORC_MASSAGE_DIR\BepInEx\plugins\VirtualOrc.dll&quot; -force; Start-Process &quot;$env:ORC_MASSAGE_DIR\OrcMassage.exe&quot;" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="run.ps1" />
     <option name="SCRIPT_OPTIONS" value="" />
