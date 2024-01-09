@@ -1,0 +1,5 @@
+﻿bin/
+obj/
+
+# Non-free, user provided
+Libs/**/Assembly-CSharp.dll 

@@ -1,0 +1,19 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Modded" type="ShConfigurationType">
+    <option name="SCRIPT_TEXT" value="Copy-Item &quot;bin\Debug\netstandard2.1\VirtualOrc.dll&quot; &quot;..\Orc Massage\BepInEx\plugins\VirtualOrc.dll&quot; -force; Start-Process &quot;..\Orc Massage\OrcMassage.exe&quot;" />
+    <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+    <option name="SCRIPT_PATH" value="run.ps1" />
+    <option name="SCRIPT_OPTIONS" value="" />
+    <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+    <option name="INTERPRETER_PATH" value="powershell.exe" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="EXECUTE_IN_TERMINAL" value="true" />
+    <option name="EXECUTE_SCRIPT_FILE" value="false" />
+    <envs />
+    <method v="2">
+      <option name="Build" default="false" projectName="VirtualOrc" projectPath="$PROJECT_DIR$/VirtualOrc.csproj" />
+    </method>
+  </configuration>
+</component>
