@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,7 +10,8 @@ using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
 using UnityEngine.XR.OpenXR;
-
+using UnityEngine.XR.OpenXR.Features;
+using UnityEngine.XR.OpenXR.Features.Interactions;
 
 namespace VirtualOrc;
 
@@ -30,19 +32,31 @@ public class Plugin : BaseUnityPlugin {
     public static Camera secondCam;
 
     public static Plugin Instance;
+    public static RuntimeXRLoaderManager XrLoaderManager;
+    
     private void Awake() {
         Instance = this;
         
         Log.SetSource(Logger);
 
         Log.Info($"Plugin {PLUGIN_GUID} is starting...");
+
+        QualitySettings.vSyncCount = 0;
         
         if (!LoadEarlyRuntimeDependencies()) {
             Log.Error("Failed to load runtime dependencies.");
         }
+        
+        if (!SetupRuntimeAssets()) {
+            Log.Error("Restart the game for VR to work!");
+            return;
+        }
 
-        if (!InitializeVRLoader()) {
-            Log.Error("Failed to initialize VR loader.");
+        if (XrLoaderManager == null) {
+            GameObject go = new("XR Loader Manager");
+            DontDestroyOnLoad(go);
+            XrLoaderManager = go.AddComponent<RuntimeXRLoaderManager>();
+            // XrLoaderManager will start a coroutine once it has spawned in
         }
         
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
@@ -100,7 +114,7 @@ public class Plugin : BaseUnityPlugin {
             ok = false;
         }
 
-        string plugins = Path.Combine(root, "Plugins");
+        string plugins = Path.Combine(root, "Plugins/x86_64");
         string uoxrTarget = Path.Combine(plugins, "UnityOpenXR.dll");
         string oxrLoaderTarget = Path.Combine(plugins, "openxr_loader.dll");
 
@@ -124,24 +138,25 @@ public class Plugin : BaseUnityPlugin {
         
         return ok;
     }
+}
 
-    private bool InitializeVRLoader() {
+public class RuntimeXRLoaderManager : MonoBehaviour {
+    private void Start() {
+        StartCoroutine(InitializeVRLoader());
+    }
+   
+    
+    private IEnumerator InitializeVRLoader() {
         Log.Info("Loading VR...");
 
-        if (!SetupRuntimeAssets()) {
-            Log.Error("Restart the game for VR to work!");
-            return false;
-        }
-        
         EnableControllerProfiles();
         InitializeXRRuntime();
 
         if (!StartDisplay()) {
-            Log.Error("Failed to start in VR mode!");
-            return false;
+            Log.Error("Failed to start in VR Display subsystem!");
         }
 
-        return true;
+        yield return null;
     }
     
     private void InitializeXRRuntime() {
@@ -157,29 +172,52 @@ public class Plugin : BaseUnityPlugin {
         ((List<XRLoader>)managerSettings.activeLoaders).Add(xrLoader);
         
         OpenXRSettings.Instance.renderMode = OpenXRSettings.RenderMode.MultiPass;
-       
+        
         Log.Info("Getting methods and invoking...");
-        typeof(XRGeneralSettings).GetMethod("InitXRSDK", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, Array.Empty<object>());
-        typeof(XRGeneralSettings).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, Array.Empty<object>());
+        typeof(XRGeneralSettings).GetMethod("InitXRSDK", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, []);
+        typeof(XRGeneralSettings).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, []);
         
     }
 
     private void EnableControllerProfiles() {
-        Log.Warning("Controller profiles not implemented");
+        var valveIndex = ScriptableObject.CreateInstance<ValveIndexControllerProfile>();
+        var htcVive = ScriptableObject.CreateInstance<HTCViveControllerProfile>();
+        var mmController = ScriptableObject.CreateInstance<MicrosoftMotionControllerProfile>();
+        var khrSimple = ScriptableObject.CreateInstance<KHRSimpleControllerProfile>();
+        var oculusTouch = ScriptableObject.CreateInstance<OculusTouchControllerProfile>();
+
+        valveIndex.enabled = true;
+        htcVive.enabled = true;
+        mmController.enabled = true;
+        khrSimple.enabled = true;
+        oculusTouch.enabled = true;
+
+        // Patch the OpenXRSettings.features field to include controller profiles
+        // This feature list is empty by default if the game isn't a VR game
+        var featList = new List<OpenXRFeature> {
+            valveIndex,
+            htcVive,
+            mmController,
+            khrSimple,
+            oculusTouch
+        };
+        typeof(OpenXRSettings).GetField("features", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(OpenXRSettings.Instance, featList.ToArray());
+ 
+        Log.Info("Enabled controller profiles.");
     }
 
     private bool StartDisplay() {
         List<XRDisplaySubsystem> displays = new();
         SubsystemManager.GetInstances(displays);
-
+        
+        Log.Info($"Found {displays.Count} displays");
         if (displays.Count <= 0) {
             return false;
         }
 
         displays[0].Start();
-        Logger.LogInfo("Started XR display subsystem.");
+        Log.Info("Started XR display subsystem.");
         
         return true;
     }
 }
-
