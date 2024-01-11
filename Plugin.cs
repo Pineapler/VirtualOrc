@@ -6,22 +6,26 @@ using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
 using UnityEngine.XR.OpenXR;
 using UnityEngine.XR.OpenXR.Features;
 using UnityEngine.XR.OpenXR.Features.Interactions;
+using VirtualOrc.Input;
 
 namespace VirtualOrc;
 
 [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
 public class Plugin : BaseUnityPlugin {
+    // ==========================================================
+    // GAME CONFIGURATION
     public const string PluginGuid = "com.pineapler.virtualorc";
     public const string PluginName = "VirtualOrc";
     public const string PluginVersion = "0.0.1";
 
-    // public static GameObject secondEye;
-    // public static Camera secondCam;
+    public const string GameDataDirName = "OrcMassage_Data";
+    // ==========================================================
 
     public static Plugin Instance;
     public static RuntimeXRLoaderManager XrLoaderManager;
@@ -31,10 +35,8 @@ public class Plugin : BaseUnityPlugin {
         
         Log.SetSource(Logger);
 
-        Log.Info($"Plugin {PluginGuid} is starting...");
+        Log.Info($"Plugin {PluginGuid} is starting");
 
-        QualitySettings.vSyncCount = 0;
-        
         if (!LoadEarlyRuntimeDependencies()) {
             Log.Error("Failed to load runtime dependencies.");
         }
@@ -44,6 +46,11 @@ public class Plugin : BaseUnityPlugin {
             return;
         }
 
+        Log.Info("Initializing InputSystem");
+        typeof(InputSystem).GetMethod("PerformDefaultPluginInitialization", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, []);
+        
+        Actions.Load();
+        
         if (XrLoaderManager == null) {
             // XrLoaderManager will start a coroutine once it has spawned in
             XrLoaderManager = new GameObject("XR Loader Manager").AddComponent<RuntimeXRLoaderManager>();
@@ -87,7 +94,7 @@ public class Plugin : BaseUnityPlugin {
     private bool SetupRuntimeAssets() {
         bool ok = true;
 
-        string root = Path.Combine(Paths.GameRootPath, "OrcMassage_Data");
+        string root = Path.Combine(Paths.GameRootPath, GameDataDirName);
         
         string subsystems = Path.Combine(root, "UnitySubsystems");
         if (!Directory.Exists(subsystems)) {
@@ -131,6 +138,10 @@ public class Plugin : BaseUnityPlugin {
     }
 }
 
+
+// ==========================================================
+// XR LOADER MANAGER
+// ==========================================================
 public class RuntimeXRLoaderManager : MonoBehaviour {
     private void Start() {
         StartCoroutine(InitializeVRLoader());
@@ -138,7 +149,7 @@ public class RuntimeXRLoaderManager : MonoBehaviour {
    
     
     private IEnumerator InitializeVRLoader() {
-        Log.Info("Loading VR...");
+        Log.Info("Loading VR");
 
         EnableControllerProfiles();
         InitializeXRRuntime();
@@ -151,7 +162,7 @@ public class RuntimeXRLoaderManager : MonoBehaviour {
     }
     
     private void InitializeXRRuntime() {
-        Log.Info("Initializing XR loader...");
+        Log.Info("Initializing XR loader");
         
         XRGeneralSettings generalSettings = ScriptableObject.CreateInstance<XRGeneralSettings>();
         XRManagerSettings managerSettings = ScriptableObject.CreateInstance<XRManagerSettings>();
@@ -164,7 +175,7 @@ public class RuntimeXRLoaderManager : MonoBehaviour {
         
         OpenXRSettings.Instance.renderMode = OpenXRSettings.RenderMode.MultiPass;
         
-        Log.Info("Getting methods and invoking...");
+        Log.Info("Getting methods and invoking");
         typeof(XRGeneralSettings).GetMethod("InitXRSDK", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, []);
         typeof(XRGeneralSettings).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, []);
         
@@ -212,3 +223,4 @@ public class RuntimeXRLoaderManager : MonoBehaviour {
         return true;
     }
 }
+// ==========================================================

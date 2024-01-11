@@ -41,6 +41,12 @@
     <Reference Include="Unity.XR.OpenXR">
       <HintPath>Libs\Unity.XR.OpenXR.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.InputSystem">
+      <HintPath>Libs\Unity.InputSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Cinemachine">
+      <HintPath>Libs\Cinemachine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <ItemGroup>

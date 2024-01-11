@@ -82,5 +82,14 @@ namespace VirtualOrc.Properties {
                 return ResourceManager.GetString("UnitySubsystemsManifest", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string vr_inputs {
+            get {
+                return ResourceManager.GetString("vr_inputs", resourceCulture);
+            }
+        }
     }
 }
