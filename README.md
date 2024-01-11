@@ -1,4 +1,17 @@
-﻿# Overview
+﻿# ⚠️ VERY EARLY WIP ⚠️
+
+This mod is barely functional and not ready for general use.
+
+I'm not sure what the scope of this mod will be at the moment. The vanilla gameplay seems to lend itself
+to a VR control scheme very well, but I'm not sure if I will have time to fully flesh it out. At the very least there will
+be 6 degrees of freedom head movement with the original keyboard/mouse controls.
+
+# VirtualOrc
+
+A VR mod for the game ["Orc Massage" by Torch Studio](https://store.steampowered.com/app/1129540/Orc_Massage/)
+
+
+# Prerequisites
 
 Install BepInEx and run the game at least once to generate the mod folders.
 

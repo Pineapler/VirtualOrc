@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using BepInEx;
@@ -15,21 +14,14 @@ using UnityEngine.XR.OpenXR.Features.Interactions;
 
 namespace VirtualOrc;
 
-[BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
+[BepInPlugin(PluginGuid, PluginName, PluginVersion)]
 public class Plugin : BaseUnityPlugin {
-    public const string PLUGIN_GUID = "com.pineapler.virtualorc";
-    public const string PLUGIN_NAME = "VirtualOrc";
-    public const string PLUGIN_VERSION = "0.0.1";
+    public const string PluginGuid = "com.pineapler.virtualorc";
+    public const string PluginName = "VirtualOrc";
+    public const string PluginVersion = "0.0.1";
 
-    public static string gameExePath = Process.GetCurrentProcess().MainModule.FileName;
-    public static string gamePath = Path.GetDirectoryName(gameExePath);
-    
-    public static List<XRDisplaySubsystemDescriptor> DisplayDescriptors = new();
-    public static List<XRDisplaySubsystem> displays = new();
-    public static XRDisplaySubsystem myDisplay;
-
-    public static GameObject secondEye;
-    public static Camera secondCam;
+    // public static GameObject secondEye;
+    // public static Camera secondCam;
 
     public static Plugin Instance;
     public static RuntimeXRLoaderManager XrLoaderManager;
@@ -39,7 +31,7 @@ public class Plugin : BaseUnityPlugin {
         
         Log.SetSource(Logger);
 
-        Log.Info($"Plugin {PLUGIN_GUID} is starting...");
+        Log.Info($"Plugin {PluginGuid} is starting...");
 
         QualitySettings.vSyncCount = 0;
         
@@ -53,10 +45,9 @@ public class Plugin : BaseUnityPlugin {
         }
 
         if (XrLoaderManager == null) {
-            GameObject go = new("XR Loader Manager");
-            DontDestroyOnLoad(go);
-            XrLoaderManager = go.AddComponent<RuntimeXRLoaderManager>();
             // XrLoaderManager will start a coroutine once it has spawned in
+            XrLoaderManager = new GameObject("XR Loader Manager").AddComponent<RuntimeXRLoaderManager>();
+            DontDestroyOnLoad(XrLoaderManager.gameObject);
         }
         
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
@@ -65,7 +56,7 @@ public class Plugin : BaseUnityPlugin {
 
     private bool LoadEarlyRuntimeDependencies() {
         try {
-            string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
             string deps = Path.Combine(current, "RuntimeDeps");
 
             foreach (string file in Directory.GetFiles(deps, "*.dll")) {
@@ -118,7 +109,7 @@ public class Plugin : BaseUnityPlugin {
         string uoxrTarget = Path.Combine(plugins, "UnityOpenXR.dll");
         string oxrLoaderTarget = Path.Combine(plugins, "openxr_loader.dll");
 
-        string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
         string uoxr = Path.Combine(current, "RuntimeDeps/UnityOpenXR.dll");
         string oxrLoader = Path.Combine(current, "RuntimeDeps/openxr_loader.dll");
 
