@@ -2,22 +2,22 @@
     "name": "vr",
     "maps": [
         {
-            "name": "Head",
-            "id": "f909da72-ee0d-4403-a778-8d6e032713e9",
+            "name": "head",
+            "id": "687bd32b-1837-4927-bec9-1a5005bffada",
             "actions": [
                 {
-                    "name": "Position",
+                    "name": "position",
                     "type": "Value",
-                    "id": "32c5dbbe-95d1-40d4-b219-d0dd285f437c",
+                    "id": "b4398d7c-1996-4044-8bb3-af58198fc0e9",
                     "expectedControlType": "Vector3",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Rotation",
+                    "name": "rotation",
                     "type": "Value",
-                    "id": "81c4018e-a92b-4404-a772-67971bda6285",
+                    "id": "e8973236-32ce-4438-9a0a-d5417000576b",
                     "expectedControlType": "Quaternion",
                     "processors": "",
                     "interactions": "",
@@ -27,147 +27,23 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "40d89fcb-8ea9-4bbf-87a8-588498d6f208",
+                    "id": "105d15ea-e14c-4e81-9a96-7ac5bf0a25a6",
                     "path": "<XRHMD>/centerEyePosition",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Position",
+                    "action": "position",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "fca6e505-1eb6-4e05-bc64-aede68e156b9",
+                    "id": "e65e6d50-017c-40fd-a2f7-3b58cfc26631",
                     "path": "<XRHMD>/centerEyeRotation",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Rotation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "LeftHand",
-            "id": "159d4a32-1b44-4ad5-9777-7568ef8c1f06",
-            "actions": [
-                {
-                    "name": "Position",
-                    "type": "Value",
-                    "id": "b6f06499-b30f-4051-af59-82a3a67f59b5",
-                    "expectedControlType": "Vector3",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "Rotation",
-                    "type": "Value",
-                    "id": "cbef18b3-7f82-4a5a-afbc-dd76483b9c57",
-                    "expectedControlType": "Quaternion",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "1c25c6f5-a4fd-45d8-bbe3-00b303c924ff",
-                    "path": "<XRController>{LeftHand}/devicePosition",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Position",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "7bce34e8-8617-4df0-abbe-1753cabb05bc",
-                    "path": "<XRController>{LeftHand}/deviceRotation",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Rotation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "RightHand",
-            "id": "b4840668-2c89-4f11-b8a6-e173bd157982",
-            "actions": [
-                {
-                    "name": "Position",
-                    "type": "Value",
-                    "id": "edd06974-457a-4170-b55f-e9eab723aa02",
-                    "expectedControlType": "Vector3",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "Rotation",
-                    "type": "Value",
-                    "id": "103a8e18-e9e6-4099-b115-eb1a99ae147e",
-                    "expectedControlType": "Quaternion",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "d2392aac-c8db-45e5-8eec-f2b7a89547a9",
-                    "path": "<XRController>{RightHand}/devicePosition",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Position",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "48545bdc-b92d-405e-b535-00a521495a3c",
-                    "path": "<XRController>{RightHand}/deviceRotation",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Rotation",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                }
-            ]
-        },
-        {
-            "name": "Controls",
-            "id": "a421e171-ad87-47b3-82a5-8919fe0fea72",
-            "actions": [
-                {
-                    "name": "Recenter",
-                    "type": "Button",
-                    "id": "330c83c3-c9a6-4809-a508-6280c3fe0d5e",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                }
-            ],
-            "bindings": [
-                {
-                    "name": "",
-                    "id": "f7f2897c-e2e0-4a39-8839-ae432e470e0d",
-                    "path": "<XRController>/recentered",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Recenter",
+                    "action": "rotation",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

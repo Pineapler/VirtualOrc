@@ -40,6 +40,8 @@ public class VrRig : MonoBehaviour {
         xrHeadset = new GameObject("xrHeadset", typeof(Camera), typeof(AudioListener));
         xrHeadset.transform.SetParent(xrOffset.transform, false);
         
+        InitInputActions();
+        
         // Move camera and audioListener to new GameObject
         Camera originalCam = GetComponent<Camera>();
         AudioListener originalAudioListener = GetComponent<AudioListener>();
@@ -56,6 +58,11 @@ public class VrRig : MonoBehaviour {
             typeof(CinemachineBrain).GetField("m_OutputCamera", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(brain, newCam);
         }
 
+    }
+
+    private void InitInputActions() {
+        Actions.Load();
+        
         // Create HMD tracker
         actions = Actions.VRInputActions;
         TrackedPoseDriver headsetPoseDriver = xrHeadset.AddComponent<TrackedPoseDriver>();
@@ -63,9 +70,9 @@ public class VrRig : MonoBehaviour {
         headsetPoseDriver.rotationAction = Actions.Head_Rotation;
     }
 
-    private void Update() {
+    // private void Update() {
         // Log.Info(Actions.Head_Rotation.ReadValue<Quaternion>());
         // xrHeadset.transform.localPosition = Actions.Head_Position.ReadValue<Vector3>();
         // xrHeadset.transform.localRotation = Actions.Head_Rotation.ReadValue<Quaternion>();
-    }
+    // }
 }

@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using System.Reflection;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Utilities;
 
 namespace VirtualOrc.Input;
 
@@ -20,30 +23,26 @@ public class Actions {
 
 
     public static void Load() {
+        Log.Info("Initializing InputSystem");
+        // typeof(InputSystem).GetMethod("PerformDefaultPluginInitialization", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, []);
+        typeof(InputSystem).GetMethod("RunInitializeInPlayer", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, []);
+        
+        Log.Info($"Loading VR actions: \n{Properties.Resources.vr_inputs}");
         VRInputActions = InputActionAsset.FromJson(Properties.Resources.vr_inputs);
         
-        VRInputActions.LoadFromJson(Properties.Resources.vr_inputs);
         
-        Log.Info("Loading VR actions");
-
-        foreach (var map in VRInputActions.actionMaps) {
-            foreach (var action in map.actions) {
-                Log.Info($"{map.name} > {action.name}");
-            }
-        }
-        
-        Head_Position = VRInputActions.FindAction("Head/Position");
-        Head_Rotation = VRInputActions.FindAction("Head/Rotation");
+        Head_Position = VRInputActions.FindAction("head/position");
         if (Head_Position == null) Log.Error("Could not find HeadPosition action!");
+        Head_Rotation = VRInputActions.FindAction("head/rotation");
         if (Head_Rotation == null) Log.Error("Could not find HeadRotation action!");
         // Head_TrackingState = VRInputActions.FindAction("Head/TrackingState");
         
-        LeftHand_Position = VRInputActions.FindAction("LeftHand/Position");
-        LeftHand_Rotation = VRInputActions.FindAction("LeftHand/Rotation");
+        // LeftHand_Position = VRInputActions.FindAction("LeftHand/Position");
+        // LeftHand_Rotation = VRInputActions.FindAction("LeftHand/Rotation");
         // LeftHand_TrackingState = VRInputActions.FindAction("LeftHand/TrackingState");
         
-        RightHand_Position = VRInputActions.FindAction("RightHand/Position");
-        RightHand_Rotation = VRInputActions.FindAction("RightHand/Rotation");
+        // RightHand_Position = VRInputActions.FindAction("RightHand/Position");
+        // RightHand_Rotation = VRInputActions.FindAction("RightHand/Rotation");
         // RightHand_TrackingState = VRInputActions.FindAction("RightHand/TrackingState");
 
         VRInputActions.Enable();

@@ -6,13 +6,11 @@ using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
 using UnityEngine.XR.OpenXR;
 using UnityEngine.XR.OpenXR.Features;
 using UnityEngine.XR.OpenXR.Features.Interactions;
-using VirtualOrc.Input;
 
 namespace VirtualOrc;
 
@@ -24,7 +22,6 @@ public class Plugin : BaseUnityPlugin {
     public const string PluginName = "VirtualOrc";
     public const string PluginVersion = "0.0.1";
 
-    public const string GameDataDirName = "OrcMassage_Data";
     // ==========================================================
 
     public static Plugin Instance;
@@ -46,10 +43,6 @@ public class Plugin : BaseUnityPlugin {
             return;
         }
 
-        Log.Info("Initializing InputSystem");
-        typeof(InputSystem).GetMethod("PerformDefaultPluginInitialization", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, []);
-        
-        Actions.Load();
         
         if (XrLoaderManager == null) {
             // XrLoaderManager will start a coroutine once it has spawned in
@@ -94,7 +87,7 @@ public class Plugin : BaseUnityPlugin {
     private bool SetupRuntimeAssets() {
         bool ok = true;
 
-        string root = Path.Combine(Paths.GameRootPath, GameDataDirName);
+        string root = Path.Combine(Paths.GameRootPath, Application.productName + "_Data");
         
         string subsystems = Path.Combine(root, "UnitySubsystems");
         if (!Directory.Exists(subsystems)) {
