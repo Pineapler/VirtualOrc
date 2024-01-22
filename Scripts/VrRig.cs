@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
 using Cinemachine;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.XR;
 using VirtualOrc.Input;
 
 namespace VirtualOrc.Scripts;
@@ -13,9 +11,6 @@ public class VrRig : MonoBehaviour {
     public Transform xrOrigin;
     public GameObject xrOffset;
     public GameObject xrHeadset;
-    
-    // TEMP
-    public InputActionAsset actions;
     
     //  xrOrigin (original Cinemachine body)
     //  |--- xrOffset
@@ -61,13 +56,13 @@ public class VrRig : MonoBehaviour {
     }
 
     private void InitInputActions() {
-        Actions.Load();
-        
-        // Create HMD tracker
-        actions = Actions.VRInputActions;
-        TrackedPoseDriver headsetPoseDriver = xrHeadset.AddComponent<TrackedPoseDriver>();
-        headsetPoseDriver.positionAction = Actions.Head_Position;
-        headsetPoseDriver.rotationAction = Actions.Head_Rotation;
+        // Actions.Load();
+        //
+        // // Create HMD tracker
+        // actions = Actions.VRInputActions;
+        // TrackedPoseDriver headsetPoseDriver = xrHeadset.AddComponent<TrackedPoseDriver>();
+        // headsetPoseDriver.positionAction = Actions.Head_Position;
+        // headsetPoseDriver.rotationAction = Actions.Head_Rotation;
     }
 
     // private void Update() {

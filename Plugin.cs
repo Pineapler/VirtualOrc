@@ -2,15 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using UnityEngine;
+using Unity.XR.OpenVR;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
-using UnityEngine.XR.OpenXR;
-using UnityEngine.XR.OpenXR.Features;
-using UnityEngine.XR.OpenXR.Features.Interactions;
+using Valve.VR;
+using VirtualOrc.Scripts;
 
 namespace VirtualOrc;
 
@@ -25,7 +26,7 @@ public class Plugin : BaseUnityPlugin {
     // ==========================================================
 
     public static Plugin Instance;
-    public static RuntimeXRLoaderManager XrLoaderManager;
+    public static RuntimeVRLoaderManager VrLoaderManager;
     
     private void Awake() {
         Instance = this;
@@ -43,17 +44,24 @@ public class Plugin : BaseUnityPlugin {
             return;
         }
 
-        
-        if (XrLoaderManager == null) {
-            // XrLoaderManager will start a coroutine once it has spawned in
-            XrLoaderManager = new GameObject("XR Loader Manager").AddComponent<RuntimeXRLoaderManager>();
-            DontDestroyOnLoad(XrLoaderManager.gameObject);
-        }
+        // if (VrLoaderManager == null) {
+        //     // XrLoaderManager will start a coroutine once it has spawned in
+        //     VrLoaderManager = new GameObject("XR Loader Manager").AddComponent<RuntimeVRLoaderManager>();
+        //     DontDestroyOnLoad(VrLoaderManager.gameObject);
+        // }
         
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
 
     }
 
+
+    private static readonly string[] PluginDllNames = {
+        "openvr_api.dll",
+        "XRSDKOpenVR.dll",
+        "UnityOpenXR.dll",
+        "openxr_loader.dll",
+    };
+    
     private bool LoadEarlyRuntimeDependencies() {
         try {
             string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
@@ -61,7 +69,7 @@ public class Plugin : BaseUnityPlugin {
 
             foreach (string file in Directory.GetFiles(deps, "*.dll")) {
                 string filename = Path.GetFileName(file);
-                if (filename == "UnityOpenXR.dll" || filename == "openxr_loader.dll") {
+                if (PluginDllNames.Contains(filename)) {
                     continue;
                 }
 
@@ -89,131 +97,41 @@ public class Plugin : BaseUnityPlugin {
 
         string root = Path.Combine(Paths.GameRootPath, Application.productName + "_Data");
         
+        // Copy subsystem manifest
         string subsystems = Path.Combine(root, "UnitySubsystems");
         if (!Directory.Exists(subsystems)) {
             Directory.CreateDirectory(subsystems);
         }
-
-        string openXr = Path.Combine(subsystems, "UnityOpenXR");
-        if (!Directory.Exists(openXr)) {
-            Directory.CreateDirectory(openXr);
+        
+        // string openXr = Path.Combine(subsystems, "UnityOpenXR");
+        string openVr = Path.Combine(subsystems, "XRSDKOpenVR");
+        if (!Directory.Exists(openVr)) {
+            Directory.CreateDirectory(openVr);
         }
 
-        string manifest = Path.Combine(openXr, "UnitySubsystemsManifest.json");
+        string manifest = Path.Combine(openVr, "UnitySubsystemsManifest.json");
         if (!File.Exists(manifest)) {
             File.WriteAllText(manifest, Properties.Resources.UnitySubsystemsManifest);
             ok = false;
         }
-
+        
+        // Copy plugins dlls
         string plugins = Path.Combine(root, "Plugins/x86_64");
-        string uoxrTarget = Path.Combine(plugins, "UnityOpenXR.dll");
-        string oxrLoaderTarget = Path.Combine(plugins, "openxr_loader.dll");
-
         string current = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-        string uoxr = Path.Combine(current, "RuntimeDeps/UnityOpenXR.dll");
-        string oxrLoader = Path.Combine(current, "RuntimeDeps/openxr_loader.dll");
 
-        if (File.Exists(uoxr)) {
-            File.Copy(uoxr, uoxrTarget, true);
-        }
-        else {
-            Log.Warning("Could not find UnityOpenXR.dll, VR might not work!");
-        }
+        foreach (string pluginDll in PluginDllNames) {
+            string target = Path.Combine(plugins, pluginDll);
+            string source = Path.Combine(current, "RuntimeDeps/" + pluginDll);
 
-        if (File.Exists(oxrLoader)) {
-            File.Copy(oxrLoader, oxrLoaderTarget, true);
-        }
-        else {
-            Log.Warning("Could not find openxr_loader.dll, VR might not work!");
+            if (File.Exists(source)) {
+                File.Copy(source, target, true);
+            }
+            else {
+                Log.Warning($"Could not find {pluginDll}, VR might not work!");
+            }
         }
         
         return ok;
     }
 }
 
-
-// ==========================================================
-// XR LOADER MANAGER
-// ==========================================================
-public class RuntimeXRLoaderManager : MonoBehaviour {
-    private void Start() {
-        StartCoroutine(InitializeVRLoader());
-    }
-   
-    
-    private IEnumerator InitializeVRLoader() {
-        Log.Info("Loading VR");
-
-        EnableControllerProfiles();
-        InitializeXRRuntime();
-
-        if (!StartDisplay()) {
-            Log.Error("Failed to start in VR Display subsystem!");
-        }
-
-        yield return null;
-    }
-    
-    private void InitializeXRRuntime() {
-        Log.Info("Initializing XR loader");
-        
-        XRGeneralSettings generalSettings = ScriptableObject.CreateInstance<XRGeneralSettings>();
-        XRManagerSettings managerSettings = ScriptableObject.CreateInstance<XRManagerSettings>();
-        OpenXRLoader xrLoader =             ScriptableObject.CreateInstance<OpenXRLoader>();
-        
-        generalSettings.Manager = managerSettings;
-        
-        ((List<XRLoader>)managerSettings.activeLoaders).Clear();
-        ((List<XRLoader>)managerSettings.activeLoaders).Add(xrLoader);
-        
-        OpenXRSettings.Instance.renderMode = OpenXRSettings.RenderMode.MultiPass;
-        
-        Log.Info("Getting methods and invoking");
-        typeof(XRGeneralSettings).GetMethod("InitXRSDK", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, []);
-        typeof(XRGeneralSettings).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, []);
-        
-    }
-
-    private void EnableControllerProfiles() {
-        var valveIndex = ScriptableObject.CreateInstance<ValveIndexControllerProfile>();
-        var htcVive = ScriptableObject.CreateInstance<HTCViveControllerProfile>();
-        var mmController = ScriptableObject.CreateInstance<MicrosoftMotionControllerProfile>();
-        var khrSimple = ScriptableObject.CreateInstance<KHRSimpleControllerProfile>();
-        var oculusTouch = ScriptableObject.CreateInstance<OculusTouchControllerProfile>();
-
-        valveIndex.enabled = true;
-        htcVive.enabled = true;
-        mmController.enabled = true;
-        khrSimple.enabled = true;
-        oculusTouch.enabled = true;
-
-        // Patch the OpenXRSettings.features field to include controller profiles
-        // This feature list is empty by default if the game isn't a VR game
-        var featList = new List<OpenXRFeature> {
-            valveIndex,
-            htcVive,
-            mmController,
-            khrSimple,
-            oculusTouch
-        };
-        typeof(OpenXRSettings).GetField("features", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(OpenXRSettings.Instance, featList.ToArray());
- 
-        Log.Info("Enabled controller profiles.");
-    }
-
-    private bool StartDisplay() {
-        List<XRDisplaySubsystem> displays = new();
-        SubsystemManager.GetInstances(displays);
-        
-        Log.Info($"Found {displays.Count} displays");
-        if (displays.Count <= 0) {
-            return false;
-        }
-
-        displays[0].Start();
-        Log.Info("Started XR display subsystem.");
-        
-        return true;
-    }
-}
-// ==========================================================

@@ -36,11 +36,14 @@
     <Reference Include="Unity.XR.Management">
       <HintPath>Libs\Unity.XR.Management.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.XR.OpenXR">
-      <HintPath>Libs\Unity.XR.OpenXR.dll</HintPath>
+    <Reference Include="Unity.XR.OpenVR">
+      <HintPath>Libs\Unity.XR.OpenVR.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.InputSystem">
-      <HintPath>Libs\Unity.InputSystem.dll</HintPath>
+    <Reference Include="Valve.VR">
+      <HintPath>Libs\SteamVR.dll</HintPath>
+    </Reference>
+    <Reference Include="Valve.VR">
+      <HintPath>Libs\SteamVR_Actions.dll</HintPath>
     </Reference>
     <Reference Include="Cinemachine">
       <HintPath>Libs\Cinemachine.dll</HintPath>

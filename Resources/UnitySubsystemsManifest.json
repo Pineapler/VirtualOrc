@@ -1,15 +1,18 @@
 {
-        "name": "OpenXR XR Plugin",
-        "version": "1.2.8",
-        "libraryName": "UnityOpenXR",
-        "displays": [
-                {
-                        "id": "OpenXR Display"
-                }
-        ],
-        "inputs": [
-                {
-                        "id": "OpenXR Input"
-                }
-        ]
+  "name": "XRSDKOpenVR",
+  "version": "1.0.0-preview.1",
+  "libraryName": "XRSDKOpenVR",
+
+  "displays": [
+    {
+      "id": "OpenVR Display"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "OpenVR Input",
+      "disablesLegacyInput": true,
+      "disablesLegacyVr" : true
+    }
+  ]
 }
