@@ -7,7 +7,7 @@
 
 - Camera rig may need to be its own object that we move around by patching the "camera change" methods
 
+# Screen space canvases
 
-# Input System
-
-- InputActionAsset.FromJson() not working? There's just no maps or actions idk
+- Main menu canvas
+  - ``

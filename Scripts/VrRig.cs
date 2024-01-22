@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using Cinemachine;
+using Pineapler.Utils;
 using UnityEngine;
+using Valve.VR;
 using VirtualOrc.Input;
 
 namespace VirtualOrc.Scripts;
@@ -56,8 +58,10 @@ public class VrRig : MonoBehaviour {
     }
 
     private void InitInputActions() {
-        // Actions.Load();
-        //
+        foreach (var actionSet in SteamVR_Input.actionSets) {
+            Log.Info($"Activating action: {actionSet.GetShortName()}");
+            actionSet.Activate();
+        }
         // // Create HMD tracker
         // actions = Actions.VRInputActions;
         // TrackedPoseDriver headsetPoseDriver = xrHeadset.AddComponent<TrackedPoseDriver>();
