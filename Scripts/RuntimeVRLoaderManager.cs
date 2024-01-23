@@ -11,6 +11,9 @@ using Valve.VR;
 namespace VirtualOrc.Scripts;
 
 public class RuntimeVRLoaderManager : MonoBehaviour {
+
+    public static GameObject rigTarget;
+    
     private void Start() {
         StartCoroutine(InitializeVRLoader());
     }
@@ -26,7 +29,8 @@ public class RuntimeVRLoaderManager : MonoBehaviour {
         var xrLoader = ScriptableObject.CreateInstance<OpenVRLoader>();
 
         var settings = OpenVRSettings.GetSettings();
-        settings.StereoRenderingMode = OpenVRSettings.StereoRenderingModes.MultiPass;
+        // settings.StereoRenderingMode = OpenVRSettings.StereoRenderingModes.MultiPass;
+        settings.StereoRenderingMode = OpenVRSettings.StereoRenderingModes.SinglePassInstanced;
         
 
         generalSettings.Manager = managerSettings;
@@ -40,11 +44,14 @@ public class RuntimeVRLoaderManager : MonoBehaviour {
         typeof(XRGeneralSettings).GetMethod("Start", BindingFlags.NonPublic | BindingFlags.Instance)!.Invoke(generalSettings, []);
 
         SteamVR.Initialize(true);
-        // SteamVR.Initialize();
 
-        // if (StartDisplay() == false) {
-        //     Log.Error("Failed to start XR display subsystem");
-        // }
+        if (StartDisplay() == false) {
+            Log.Error("Failed to start XR display subsystem");
+            yield return null;
+        }
+        
+        Log.Info("Inserting VR rig");
+        rigTarget.AddComponent<VrRig>();
 
         yield return null;
     }

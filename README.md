@@ -15,7 +15,7 @@ A VR mod for the game ["Orc Massage" by Torch Studio](https://store.steampowered
 
 Install BepInEx and run the game at least once to generate the mod folders.
 
-# Building and installing plugin
+# Building and installing plugin (OUTDATED - I'll update this once I know exactly which libraries are needed)
 
 - Copy `<game>/OrcMassage_Data/Managed/Assembly-CSharp.dll` to `Libs`
 - Build

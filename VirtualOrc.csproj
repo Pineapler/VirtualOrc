@@ -52,5 +52,13 @@
     <Reference Include="Cinemachine">
       <HintPath>Libs\Cinemachine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.SpatialTracking">
+      <HintPath>Libs\UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  
+  <ItemGroup>
+    <Folder Include="StreamingAssets\SteamVR\" />
   </ItemGroup>
 </Project>

@@ -1,13 +1,9 @@
-﻿# Camera rig
-- Move Unity camera to a child gameobject
-  - Update CinemachineBrain.OutputCamera to point to child
-  - Move AudioListener to child
-- Child gameobject gets local position from TrackedPoseDriver
+﻿# WIP
+
+- [ ] Camera should self-recentre the first time headset tracking is gained
+- [ ] Orbit camera needs exploring
 
 
-- Camera rig may need to be its own object that we move around by patching the "camera change" methods
+# Backlog
 
-# Screen space canvases
-
-- Main menu canvas
-  - ``
+- [ ] Screenspace canvases should be moved to world-space (children of VR rig)
