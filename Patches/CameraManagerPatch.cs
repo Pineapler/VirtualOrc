@@ -23,14 +23,13 @@ public class CameraManagerPatch {
         }
     }
 
-    // [HarmonyPrefix]
-    // [HarmonyPatch(typeof(CameraManager), nameof(CameraManager.SetActiveCamera))]
-    // private static void SetActiveCameraDebug(CameraManager __instance, GameCameraType ActiveCamera) {
-    //     Log.Info($"SetActiveCamera({ActiveCamera}) called");
-    //     foreach (GameObject obj in __instance.Cameras) {
-    //         Log.Info(obj.name);
-    //     }
-    // }
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CameraManager), nameof(CameraManager.SetActiveCamera))]
+    private static void SetActiveCameraDebug(CameraManager __instance, GameCameraType ActiveCamera) {
+        Log.Info($"SetActiveCamera({ActiveCamera})");
+        Log.Info($"- Main cam: {__instance.MainCam}");
+        Log.Info($"- Orbit: {__instance.MainCam.GetComponent<CameraOrbit>()}");
+    }
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CameraManager), nameof(CameraManager.SetActiveCamera))]

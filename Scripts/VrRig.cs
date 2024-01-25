@@ -15,10 +15,14 @@ public class VrRig : MonoBehaviour {
     
     public GameObject camCine;
     public GameObject camXr;
+    public CameraOrbit camCineOrbit;
 
     public TrackedPoseDriver headsetDriver;
 
     public CameraManager cameraManager;
+
+    public float autoRecentreDistance = 0.5f;
+    
     
     //  xrOrigin (original Cinemachine body)
     //  |--- xrOffset
@@ -37,16 +41,21 @@ public class VrRig : MonoBehaviour {
 
 
         camXr = gameObject;
-        camXr.name = "MainCam - XR Headset";
+        camXr.name = "XR Headset";
         camCine = Instantiate(camXr, transform.parent);
         
         // Turn off cinemachine brain on the original camera (now xr camera)
-        camXr.GetComponent<CinemachineBrain>().enabled = false;
+        // camXr.GetComponent<CinemachineBrain>().enabled = false;
+        Destroy(camXr.GetComponent<CinemachineBrain>());
         
         // Turn off camera and audio listener on cinemachine brain
         camCine.GetComponent<Camera>().enabled = false;
-        camCine.GetComponent<AudioListener>().enabled = false;
-        camCine.tag = "untagged";
+        // camCine.GetComponent<AudioListener>().enabled = false;
+        // Destroy(camCine.GetComponent<EPOOutline.Outliner>());
+        // Destroy(camCine.GetComponent<UniversalAdditionalCameraData>());
+        // Destroy(camCine.GetComponent<Camera>());
+        Destroy(camCine.GetComponent<AudioListener>());
+        camCine.tag = "Untagged";
         camCine.name = "MainCam"; // Name is important - CameraManager does string comparison
         
         // Set up rig as child of cinemachine camera
@@ -59,12 +68,11 @@ public class VrRig : MonoBehaviour {
         cameraManager = FindObjectOfType<CameraManager>();
         cameraManager.Cameras.Add(camCine);
         cameraManager.MainCam = camCine;
+        cameraManager.MainCamOrbit = camCine.GetComponent<CameraOrbit>();
         
         InitInputActions();
         
-        // TODO: Recentre on first tracking established
-        // Just estimate for now.
-        rigOffset.transform.localPosition += new Vector3(0, -1.2f, 0);
+        
     }
 
 
@@ -85,9 +93,10 @@ public class VrRig : MonoBehaviour {
         rigOffset.transform.position += rigRoot.transform.position - camXr.transform.position;
     }
 
-    // private void Update() {
-        // Log.Info(Actions.Head_Rotation.ReadValue<Quaternion>());
-        // xrHeadset.transform.localPosition = Actions.Head_Position.ReadValue<Vector3>();
-        // xrHeadset.transform.localRotation = Actions.Head_Rotation.ReadValue<Quaternion>();
-    // }
+    private void Update() {
+        Vector3 offset = rigRoot.transform.position - camXr.transform.position;
+        if (offset.sqrMagnitude > autoRecentreDistance * autoRecentreDistance) {
+            Recentre();
+        }
+    }
 }
