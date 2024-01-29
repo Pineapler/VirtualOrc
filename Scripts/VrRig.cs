@@ -1,7 +1,9 @@
-﻿using Cinemachine;
+﻿using System.Reflection;
+using Cinemachine;
 using Pineapler.Utils;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Serialization;
 using UnityEngine.SpatialTracking;
 using Valve.VR;
 
@@ -13,11 +15,15 @@ public class VrRig : MonoBehaviour {
     public Transform rigRoot;
     public Transform rigOffset;
     
-    public GameObject camCine;
-    public GameObject camXr;
-    public CameraOrbit camCineOrbit;
-
+    public GameObject cineObj;
+    public CameraOrbit cineOrbit;
+    public Camera cineCam;
+    
+    public GameObject headsetObj;
     public TrackedPoseDriver headsetDriver;
+    public Camera headsetCam;
+
+
 
     public CameraManager cameraManager;
 
@@ -37,50 +43,30 @@ public class VrRig : MonoBehaviour {
         }
         Instance = this;
         
+        
         Log.Info("Initializing VR Rig");
+        
+        SeparateCinemachineBrain();
+        
+        SetupXrRig();
 
+        FixCameraManagerRefs();
 
-        camXr = gameObject;
-        camXr.name = "XR Headset";
-        camCine = Instantiate(camXr, transform.parent);
-        
-        // Turn off cinemachine brain on the original camera (now xr camera)
-        // camXr.GetComponent<CinemachineBrain>().enabled = false;
-        Destroy(camXr.GetComponent<CinemachineBrain>());
-        
-        // Turn off camera and audio listener on cinemachine brain
-        camCine.GetComponent<Camera>().enabled = false;
-        // camCine.GetComponent<AudioListener>().enabled = false;
-        // Destroy(camCine.GetComponent<EPOOutline.Outliner>());
-        // Destroy(camCine.GetComponent<UniversalAdditionalCameraData>());
-        // Destroy(camCine.GetComponent<Camera>());
-        Destroy(camCine.GetComponent<AudioListener>());
-        camCine.tag = "Untagged";
-        camCine.name = "MainCam"; // Name is important - CameraManager does string comparison
-        
-        // Set up rig as child of cinemachine camera
-        rigRoot = new GameObject("XR Rig Root").transform;
-        rigRoot.SetParent(camCine.transform, false);
-        rigOffset = new GameObject("XR Rig Offset").transform;
-        rigOffset.SetParent(rigRoot, false);
-        camXr.transform.SetParent(rigOffset, false);
+        FixBodyStateRenderCam();
 
-        cameraManager = FindObjectOfType<CameraManager>();
-        cameraManager.Cameras.Add(camCine);
-        cameraManager.MainCam = camCine;
-        cameraManager.MainCamOrbit = camCine.GetComponent<CameraOrbit>();
-        
+        FixInteractableHintUI();
+
         InitInputActions();
         
-        
     }
+
 
 
     private void InitInputActions() {
         Log.Info("Activating input actions");
        
         // Head tracker
-        headsetDriver = camXr.AddComponent<TrackedPoseDriver>();
+        headsetDriver = headsetObj.AddComponent<TrackedPoseDriver>();
         
         foreach (var actionSet in SteamVR_Input.actionSets) {
             Log.Info($"Activating action set: {actionSet.GetShortName()}");
@@ -90,13 +76,67 @@ public class VrRig : MonoBehaviour {
     }
 
     public void Recentre() {
-        rigOffset.transform.position += rigRoot.transform.position - camXr.transform.position;
+        rigOffset.transform.position += rigRoot.transform.position - headsetObj.transform.position;
     }
 
     private void Update() {
-        Vector3 offset = rigRoot.transform.position - camXr.transform.position;
+        Vector3 offset = rigRoot.transform.position - headsetObj.transform.position;
         if (offset.sqrMagnitude > autoRecentreDistance * autoRecentreDistance) {
             Recentre();
+        }
+    }
+
+    // ##########
+    // ## INIT ##
+    // ##########
+
+    private void SeparateCinemachineBrain() {
+        headsetObj = gameObject;
+        
+        // Set up cineObj
+        cineObj = Instantiate(headsetObj, transform.parent);
+        cineObj.tag = "CinemachineCam";
+        cineObj.name = "MainCam"; // Name is important - CameraManager does string comparison
+        
+        Destroy(cineObj.GetComponent<AudioListener>());
+        cineCam = cineObj.GetComponent<Camera>();
+        cineCam.enabled = false;
+       
+        headsetObj.name = "XR Headset";
+        Destroy(headsetObj.GetComponent<CinemachineBrain>());
+        headsetCam = headsetObj.GetComponent<Camera>();
+    }
+    
+    private void SetupXrRig() {
+        rigRoot = new GameObject("XR Rig Root").transform;
+        rigRoot.SetParent(cineObj.transform, false);
+        
+        rigOffset = new GameObject("XR Rig Offset").transform;
+        rigOffset.SetParent(rigRoot, false);
+        
+        headsetObj.transform.SetParent(rigOffset, false);
+    }
+    
+    private void FixCameraManagerRefs() {
+        cameraManager = FindObjectOfType<CameraManager>();
+        cameraManager.Cameras.Add(cineObj);
+        cameraManager.MainCam = cineObj;
+        cameraManager.MainCamOrbit = cineObj.GetComponent<CameraOrbit>();
+    }
+    
+    private void FixBodyStateRenderCam() {
+        FieldInfo mainCamField = typeof(BodyStateRenderCam).GetField("mainCam", BindingFlags.Instance | BindingFlags.NonPublic);
+        foreach (BodyStateRenderCam bsrc in FindObjectsOfType<BodyStateRenderCam>()) {
+            Log.Info($"Setting {bsrc}.mainCam to headsetCam");
+            mainCamField.SetValue(bsrc, headsetCam);
+        }
+    }
+
+    private void FixInteractableHintUI() {
+        FieldInfo camField = typeof(InteractableHintUI).GetField("cam", BindingFlags.Instance | BindingFlags.NonPublic);
+        foreach (InteractableHintUI ui in FindObjectsOfType<InteractableHintUI>()) {
+            Log.Info($"Setting {ui}.cam to headsetCam");
+            camField.SetValue(ui, headsetCam);
         }
     }
 }

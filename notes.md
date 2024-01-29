@@ -1,14 +1,11 @@
 ﻿# WIP
 
-- [ ] Camera should self-recentre the first time headset tracking is gained
-  - For now, recentre whenever headset gets too far from origin
-- [ ] Fix UI icon sync issues in massage (`BodyStateRenderCam.cs`)
-- [ ] Fix UI icon sync issues in main menu
-  - These should eventually be turned into world space objects or something
+- [ ] Move all InteractableHintUI objects to world space and fix their canvases
+  - might need to billboard them?
 
 # Backlog
 
-- [ ] Screenspace canvases should be moved to world-space (children of VR rig)
+- [ ] Hook the SteamVR recentre event and apply our own `VrRig().Recentre`. Also do Y rotation.
 
 # Other mods?
 
