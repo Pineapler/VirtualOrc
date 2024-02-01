@@ -2,15 +2,21 @@
 using Cinemachine;
 using Pineapler.Utils;
 using UnityEngine;
-using UnityEngine.Animations;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.Serialization;
 using UnityEngine.SpatialTracking;
+
 using Valve.VR;
 
 namespace VirtualOrc.Scripts;
 
 public class VrRig : MonoBehaviour {
     public static VrRig Instance;
+    
+    // SETTINGS
+    public bool autoRecentre = true;
+    // ========
+    
 
     public Transform rigRoot;
     public Transform rigOffset;
@@ -22,6 +28,9 @@ public class VrRig : MonoBehaviour {
     public GameObject headsetObj;
     public TrackedPoseDriver headsetDriver;
     public Camera headsetCam;
+
+    [FormerlySerializedAs("uiCamObj")] public GameObject uiObj;
+    public Camera uiCam;
 
 
 
@@ -48,6 +57,8 @@ public class VrRig : MonoBehaviour {
         
         SeparateCinemachineBrain();
         
+        ConfigureUICamera();
+        
         SetupXrRig();
 
         FixCameraManagerRefs();
@@ -55,6 +66,7 @@ public class VrRig : MonoBehaviour {
         FixBodyStateRenderCam();
 
         FixInteractableHintUI();
+        FixChatNotify();
 
         InitInputActions();
         
@@ -81,8 +93,11 @@ public class VrRig : MonoBehaviour {
 
     private void Update() {
         Vector3 offset = rigRoot.transform.position - headsetObj.transform.position;
-        if (offset.sqrMagnitude > autoRecentreDistance * autoRecentreDistance) {
-            Recentre();
+        
+        if (autoRecentre) {
+            if (offset.sqrMagnitude > autoRecentreDistance * autoRecentreDistance) {
+                Recentre();
+            }
         }
     }
 
@@ -95,7 +110,7 @@ public class VrRig : MonoBehaviour {
         
         // Set up cineObj
         cineObj = Instantiate(headsetObj, transform.parent);
-        cineObj.tag = "CinemachineCam";
+        cineObj.tag = "Untagged";
         cineObj.name = "MainCam"; // Name is important - CameraManager does string comparison
         
         Destroy(cineObj.GetComponent<AudioListener>());
@@ -105,6 +120,26 @@ public class VrRig : MonoBehaviour {
         headsetObj.name = "XR Headset";
         Destroy(headsetObj.GetComponent<CinemachineBrain>());
         headsetCam = headsetObj.GetComponent<Camera>();
+    }
+
+    private void ConfigureUICamera() {
+        int uiMask = LayerMask.GetMask("UI");
+        headsetCam.cullingMask &= ~uiMask; // Remove UI layer from main cam
+        
+        uiObj = new GameObject("UI Camera");
+        uiObj.transform.SetParent(headsetObj.transform, false);
+        uiCam = uiObj.AddComponent<Camera>();
+        uiCam.CopyFrom(headsetCam);
+
+        
+        uiCam.cullingMask = uiMask;
+        uiCam.clearFlags = CameraClearFlags.Depth;
+        uiCam.depth = 10;
+       
+        // Set up overlay
+        UniversalAdditionalCameraData adlCamData = uiObj.AddComponent<UniversalAdditionalCameraData>();
+        adlCamData.renderType = CameraRenderType.Overlay;
+        headsetCam.GetUniversalAdditionalCameraData().cameraStack.Add(uiCam);
     }
     
     private void SetupXrRig() {
@@ -135,8 +170,13 @@ public class VrRig : MonoBehaviour {
     private void FixInteractableHintUI() {
         FieldInfo camField = typeof(InteractableHintUI).GetField("cam", BindingFlags.Instance | BindingFlags.NonPublic);
         foreach (InteractableHintUI ui in FindObjectsOfType<InteractableHintUI>()) {
-            Log.Info($"Setting {ui}.cam to headsetCam");
             camField.SetValue(ui, headsetCam);
+        }
+    }
+
+
+    private void FixChatNotify() {
+        foreach (ChatNotify cn in FindObjectsOfType<ChatNotify>()) {
         }
     }
 }

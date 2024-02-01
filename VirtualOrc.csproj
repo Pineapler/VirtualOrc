@@ -55,6 +55,9 @@
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>Libs\UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+      <HintPath>Libs\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   
