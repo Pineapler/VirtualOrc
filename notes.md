@@ -1,14 +1,14 @@
 ﻿# WIP
 
-- [ ] Billboard the floating indicator canvases
 - [ ] Move full body massage targets UI to world space
-  - These use a single canvas, probably need to do some weird billboarding and algebra
+  - These use a single canvas, probably need to do perspective math or something
 
 # Backlog
 
 - [ ] Change raycast mechanism to use controller
 - [ ] Hook the SteamVR recentre event and apply our own `VrRig().Recentre`. Also do Y rotation.
 - [ ] Fix LogSystemManager properly. Currently disabled the UI so that it's not cluttering the screen.
+- [ ] Replace the missing fluid sim water with a vr-friendly alternative
 
 # Complete
 

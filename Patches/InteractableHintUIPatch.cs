@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using UnityEngine;
+using VirtualOrc.Scripts;
 
 namespace VirtualOrc.Patches;
 
@@ -16,6 +17,9 @@ public class InteractableHintUIPatch {
         Transform canvasTransform = canvas.transform;
         canvasTransform.localPosition = Vector3.zero;
         canvasTransform.localScale = Vector3.one;
+
+        var wsCanvasTools = __instance.gameObject.AddComponent<WorldSpaceCanvasTools>();
+        wsCanvasTools.canvasTransform = __instance.hintPoint.transform;
     }
    
     

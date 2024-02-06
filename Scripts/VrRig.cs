@@ -47,7 +47,7 @@ public class VrRig : MonoBehaviour {
 
     private void Awake() {
         if (Instance != null) {
-            DestroyImmediate(this);
+            Destroy(this);
             return;
         }
         Instance = this;

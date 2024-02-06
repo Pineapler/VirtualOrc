@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using UnityEngine;
+using VirtualOrc.Scripts;
 
 namespace VirtualOrc.Patches;
 
@@ -17,6 +18,9 @@ public class ChatNotifyPatch {
         Transform canvasTransform = canvas.transform;
         canvasTransform.localScale = Vector3.one;
         // * scale and rotation is handled by a method patch
+        
+        var wsCanvasTools = __instance.gameObject.AddComponent<WorldSpaceCanvasTools>();
+        wsCanvasTools.canvasTransform = __instance.holder.transform;
     }
     
     
