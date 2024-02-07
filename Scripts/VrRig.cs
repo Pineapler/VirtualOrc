@@ -1,9 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using Cinemachine;
 using Pineapler.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.Serialization;
 using UnityEngine.SpatialTracking;
 
 using Valve.VR;
@@ -15,6 +16,8 @@ public class VrRig : MonoBehaviour {
     
     // SETTINGS
     public bool autoRecentre = true;
+    public float canvasDistance = 1f;
+    public float canvasScaleFactor = 0.00075f;
     // ========
     
 
@@ -29,22 +32,37 @@ public class VrRig : MonoBehaviour {
     public TrackedPoseDriver headsetDriver;
     public Camera headsetCam;
 
-    [FormerlySerializedAs("uiCamObj")] public GameObject uiObj;
+    public GameObject uiCamObj;
     public Camera uiCam;
+
+    public GameObject canvasHolder;
 
 
 
     public CameraManager cameraManager;
 
     public float autoRecentreDistance = 0.5f;
-    
-    
+
+    private static UnityEvent _onReady = new();
+    private static bool _isReady = false;
+
+
     //  xrOrigin (original Cinemachine body)
     //  |--- xrOffset
     //      |--- xrHeadset
     //      |--- xrControllerL
     //      |--- xrControllerR
 
+    public static void OnReady(UnityAction action) {
+        if (_isReady) {
+            action.Invoke();
+            return;
+        }
+        
+        _onReady.AddListener(action);
+    }
+    
+    
     private void Awake() {
         if (Instance != null) {
             Destroy(this);
@@ -54,8 +72,11 @@ public class VrRig : MonoBehaviour {
         
         
         Log.Info("Initializing VR Rig");
+
         
         SeparateCinemachineBrain();
+        
+        SetupCanvasHolder();
         
         ConfigureUICamera();
         
@@ -69,7 +90,10 @@ public class VrRig : MonoBehaviour {
         FixChatNotify();
 
         InitInputActions();
-        
+
+        _isReady = true;
+        _onReady?.Invoke();
+        _onReady?.RemoveAllListeners();
     }
 
 
@@ -105,6 +129,14 @@ public class VrRig : MonoBehaviour {
     // ## INIT ##
     // ##########
 
+    private void SetupCanvasHolder() {
+        canvasHolder = new GameObject("CanvasHolder");
+        canvasHolder.layer = LayerMask.NameToLayer("UI");
+        canvasHolder.transform.SetParent(cineObj.transform, false);
+        canvasHolder.transform.localPosition = new Vector3(0, 0, canvasDistance);
+        canvasHolder.transform.localScale = new Vector3(canvasScaleFactor, canvasScaleFactor, 1);
+    }
+
     private void SeparateCinemachineBrain() {
         headsetObj = gameObject;
         
@@ -126,9 +158,9 @@ public class VrRig : MonoBehaviour {
         int uiMask = LayerMask.GetMask("UI");
         headsetCam.cullingMask &= ~uiMask; // Remove UI layer from main cam
         
-        uiObj = new GameObject("UI Camera");
-        uiObj.transform.SetParent(headsetObj.transform, false);
-        uiCam = uiObj.AddComponent<Camera>();
+        uiCamObj = new GameObject("UI Camera");
+        uiCamObj.transform.SetParent(headsetObj.transform, false);
+        uiCam = uiCamObj.AddComponent<Camera>();
         uiCam.CopyFrom(headsetCam);
 
         
@@ -137,7 +169,7 @@ public class VrRig : MonoBehaviour {
         uiCam.depth = 10;
        
         // Set up overlay
-        UniversalAdditionalCameraData adlCamData = uiObj.AddComponent<UniversalAdditionalCameraData>();
+        UniversalAdditionalCameraData adlCamData = uiCamObj.AddComponent<UniversalAdditionalCameraData>();
         adlCamData.renderType = CameraRenderType.Overlay;
         headsetCam.GetUniversalAdditionalCameraData().cameraStack.Add(uiCam);
     }

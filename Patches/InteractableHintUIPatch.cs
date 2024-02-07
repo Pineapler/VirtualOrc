@@ -21,14 +21,4 @@ public class InteractableHintUIPatch {
         var wsCanvasTools = __instance.gameObject.AddComponent<WorldSpaceCanvasTools>();
         wsCanvasTools.canvasTransform = __instance.hintPoint.transform;
     }
-   
-    
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(InteractableHintUI), "ShowInScreenPoint")]
-    private static bool ApplyPerspectiveScaleAndBillboard(InteractableHintUI __instance) {
-        __instance.transform.localScale = new Vector3(0.005f, 0.005f, 0.005f);
-        // TODO apply scale based on how far the canvas is from the camera
-        // TODO apply billboard
-        return false;
-    }
 }

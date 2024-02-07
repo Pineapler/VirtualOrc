@@ -1,7 +1,10 @@
 ﻿# WIP
 
+- [ ] Controller laser interaction
 - [ ] Move full body massage targets UI to world space
   - These use a single canvas, probably need to do perspective math or something
+- [ ] Maybe fix screen space raycasting? See InputManager.cs
+- [ ] Patch out WaterFiller (null ref from zibra liquids)
 
 # Backlog
 
@@ -16,6 +19,7 @@
 - [X] VR camera rig that follows the vanilla camera
 - [X] Patch out features that would crash VR (Zibra Liquid)
 - [X] World space UI elements use an overlay camera
+- [X] Move main menu canvas to world space (No interaction)
 
 # Other mods?
 
