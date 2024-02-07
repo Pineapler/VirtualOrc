@@ -1,29 +1,6 @@
 {
   "actions": [
     {
-      "name": "/actions/default/in/InteractUI",
-      "type": "boolean"
-    },
-    {
-      "name": "/actions/default/in/Pose",
-      "type": "pose"
-    },
-    {
-      "name": "/actions/default/in/SkeletonLeftHand",
-      "type": "skeleton",
-      "skeleton": "/skeleton/hand/left"
-    },
-    {
-      "name": "/actions/default/in/SkeletonRightHand",
-      "type": "skeleton",
-      "skeleton": "/skeleton/hand/right"
-    },
-    {
-      "name": "/actions/default/in/HeadsetOnHead",
-      "type": "boolean",
-      "requirement": "optional"
-    },
-    {
       "name": "/actions/default/in/GrabMove",
       "type": "boolean"
     },
@@ -32,7 +9,19 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/default/in/Recentre",
+      "name": "/actions/default/in/Interact",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/InteractSecondary",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/ToggleUI",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/default/in/Pause",
       "type": "boolean"
     },
     {
@@ -103,15 +92,13 @@
   "localization": [
     {
       "language_tag": "en_US",
-      "/actions/default/in/HeadsetOnHead": "Headset on head (proximity sensor)",
-      "/actions/default/in/InteractUI": "Interact With UI",
-      "/actions/default/in/Pose": "Pose",
-      "/actions/default/in/SkeletonLeftHand": "Skeleton (Left)",
-      "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
       "/actions/default/out/Haptic": "Haptic",
       "/actions/default/in/RadialMenu": "Radial menu",
       "/actions/default/in/GrabMove": "Grab move",
-      "/actions/default/in/Recentre": "Recentre"
+      "/actions/default/in/Interact": "Interact",
+      "/actions/default/in/InteractSecondary": "Interact secondary",
+      "/actions/default/in/ToggleUI": "Toggle UI",
+      "/actions/default/in/Pause": "Pause"
     }
   ]
 }

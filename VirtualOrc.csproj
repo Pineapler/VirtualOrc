@@ -10,11 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Libs\**" />
     <Compile Remove="RuntimeDeps\**" />
-    <EmbeddedResource Remove="Libs\**" />
     <EmbeddedResource Remove="RuntimeDeps\**" />
-    <None Remove="Libs\**" />
     <None Remove="RuntimeDeps\**" />
     <EmbeddedResource Update="Utils\Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -55,6 +52,9 @@
     <Reference Include="UnityEngine.SpatialTracking">
       <HintPath>Libs\UnityEngine.SpatialTracking.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Libs\UnityEngine.UI.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
       <HintPath>Libs\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
     </Reference>
@@ -63,5 +63,10 @@
   
   <ItemGroup>
     <Folder Include="StreamingAssets\SteamVR\" />
+  </ItemGroup>
+  
+  
+  <ItemGroup>
+    <Content Include="Libs\Assembly-CSharp.dll" />
   </ItemGroup>
 </Project>

@@ -9,16 +9,7 @@
     },
     "/actions/default": {
       "chords": [],
-      "poses": [
-        {
-          "output": "/actions/default/in/pose",
-          "path": "/user/hand/left/pose/raw"
-        },
-        {
-          "output": "/actions/default/in/pose",
-          "path": "/user/hand/right/pose/raw"
-        }
-      ],
+      "poses": [],
       "haptics": [
         {
           "output": "/actions/default/out/haptic",
@@ -29,28 +20,7 @@
           "path": "/user/hand/right/output/haptic"
         }
       ],
-      "sources": [
-        {
-          "path": "/user/hand/left/input/primary",
-          "mode": "button",
-          "parameters": {},
-          "inputs": {
-            "click": {
-              "output": "/actions/default/in/interactui"
-            }
-          }
-        },
-        {
-          "path": "/user/hand/right/input/primary",
-          "mode": "button",
-          "parameters": {},
-          "inputs": {
-            "click": {
-              "output": "/actions/default/in/interactui"
-            }
-          }
-        }
-      ],
+      "sources": [],
       "skeleton": []
     },
     "/actions/platformer": {

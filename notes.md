@@ -30,3 +30,8 @@
 - [ ] SetGirlCostume 
   - Currently costume is set in `VipMassageGameSystem.CheckCostume()` based on heart level.
   - Instead have these as unlocked costumes and let the player choose on massage begin.
+
+## Notes
+
+- OrcTouchingHand.cs has cam/mouse raycast logic
+- Buttons have event handlers on PointerEnter

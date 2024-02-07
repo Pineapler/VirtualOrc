@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using Cinemachine;
 using Pineapler.Utils;
 using UnityEngine;
@@ -8,6 +7,7 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.SpatialTracking;
 
 using Valve.VR;
+using Valve.VR.Extras;
 
 namespace VirtualOrc.Scripts;
 
@@ -16,11 +16,15 @@ public class VrRig : MonoBehaviour {
     
     // SETTINGS
     public bool autoRecentre = true;
+    public float autoRecentreDistance = 0.5f;
     public float canvasDistance = 1f;
     public float canvasScaleFactor = 0.00075f;
     // ========
     
 
+    private static UnityEvent _onReady = new();
+    private static bool _isReady = false;
+    
     public Transform rigRoot;
     public Transform rigOffset;
     
@@ -29,7 +33,6 @@ public class VrRig : MonoBehaviour {
     public Camera cineCam;
     
     public GameObject headsetObj;
-    public TrackedPoseDriver headsetDriver;
     public Camera headsetCam;
 
     public GameObject uiCamObj;
@@ -37,15 +40,10 @@ public class VrRig : MonoBehaviour {
 
     public GameObject canvasHolder;
 
-
+    public GameObject leftController;
+    public GameObject rightController;
 
     public CameraManager cameraManager;
-
-    public float autoRecentreDistance = 0.5f;
-
-    private static UnityEvent _onReady = new();
-    private static bool _isReady = false;
-
 
     //  xrOrigin (original Cinemachine body)
     //  |--- xrOffset
@@ -81,13 +79,14 @@ public class VrRig : MonoBehaviour {
         ConfigureUICamera();
         
         SetupXrRig();
+        
+        SetupControllers();
 
         FixCameraManagerRefs();
 
         FixBodyStateRenderCam();
 
         FixInteractableHintUI();
-        FixChatNotify();
 
         InitInputActions();
 
@@ -101,13 +100,7 @@ public class VrRig : MonoBehaviour {
     private void InitInputActions() {
         Log.Info("Activating input actions");
        
-        // Head tracker
-        headsetDriver = headsetObj.AddComponent<TrackedPoseDriver>();
-        
-        foreach (var actionSet in SteamVR_Input.actionSets) {
-            Log.Info($"Activating action set: {actionSet.GetShortName()}");
-            actionSet.Activate();
-        }
+        SteamVR_Actions._default.Activate();
         
     }
 
@@ -182,6 +175,29 @@ public class VrRig : MonoBehaviour {
         rigOffset.SetParent(rigRoot, false);
         
         headsetObj.transform.SetParent(rigOffset, false);
+        var headsetDriver = headsetObj.AddComponent<TrackedPoseDriver>();
+    }
+
+    private void SetupControllers() {
+        leftController = new GameObject("XR Controller L");
+        leftController.transform.SetParent(rigOffset, false);
+        var leftPose = leftController.AddComponent<SteamVR_Behaviour_Pose>();
+        leftPose.inputSource = SteamVR_Input_Sources.LeftHand;
+        var leftDriver = leftController.AddComponent<TrackedPoseDriver>();
+        leftDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRController, TrackedPoseDriver.TrackedPose.LeftPose);
+        
+        rightController = new GameObject("XR Controller R");
+        rightController.transform.SetParent(rigOffset, false);
+        var rightPose = rightController.AddComponent<SteamVR_Behaviour_Pose>();
+        rightPose.inputSource = SteamVR_Input_Sources.RightHand;
+        var rightDriver = rightController.AddComponent<TrackedPoseDriver>();
+        rightDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRController, TrackedPoseDriver.TrackedPose.RightPose);
+
+        var leftLaser = leftController.AddComponent<LaserUIInput>();
+        leftLaser.inputHand = SteamVR_Input_Sources.LeftHand;
+        var rightLaser = rightController.AddComponent<LaserUIInput>();
+        rightLaser.inputHand = SteamVR_Input_Sources.RightHand;
+        
     }
     
     private void FixCameraManagerRefs() {
@@ -203,12 +219,6 @@ public class VrRig : MonoBehaviour {
         FieldInfo camField = typeof(InteractableHintUI).GetField("cam", BindingFlags.Instance | BindingFlags.NonPublic);
         foreach (InteractableHintUI ui in FindObjectsOfType<InteractableHintUI>()) {
             camField.SetValue(ui, headsetCam);
-        }
-    }
-
-
-    private void FixChatNotify() {
-        foreach (ChatNotify cn in FindObjectsOfType<ChatNotify>()) {
         }
     }
 }

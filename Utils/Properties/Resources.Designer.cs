@@ -85,29 +85,5 @@ namespace Pineapler.Utils.Properties {
                 return ResourceManager.GetString("UnitySubsystemsManifest", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {
-        ///    &quot;name&quot;: &quot;vr&quot;,
-        ///    &quot;maps&quot;: [
-        ///        {
-        ///            &quot;name&quot;: &quot;head&quot;,
-        ///            &quot;id&quot;: &quot;687bd32b-1837-4927-bec9-1a5005bffada&quot;,
-        ///            &quot;actions&quot;: [
-        ///                {
-        ///                    &quot;name&quot;: &quot;position&quot;,
-        ///                    &quot;type&quot;: &quot;Value&quot;,
-        ///                    &quot;id&quot;: &quot;b4398d7c-1996-4044-8bb3-af58198fc0e9&quot;,
-        ///                    &quot;expectedControlType&quot;: &quot;Vector3&quot;,
-        ///                    &quot;processors&quot;: &quot;&quot;,
-        ///                    &quot;interactions&quot;: &quot;&quot;,
-        ///                    &quot;initialStateCheck&quot;: true
-        ///                }, [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string vr_inputs {
-            get {
-                return ResourceManager.GetString("vr_inputs", resourceCulture);
-            }
-        }
     }
 }
