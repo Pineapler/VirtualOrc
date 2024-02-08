@@ -1,5 +1,6 @@
 ﻿# WIP
 
+- [ ] Laser interaction with world space interactables (phone, client, etc.)
 - [ ] Controller laser interaction (partial)
 - [ ] Move full body massage targets UI to world space
   - These use a single canvas, probably need to do perspective math or something
@@ -11,6 +12,11 @@
 - [ ] Hook the SteamVR recentre event and apply our own `VrRig().Recentre`. Also do Y rotation.
 - [ ] Fix LogSystemManager properly. Currently disabled the UI so that it's not cluttering the screen.
 - [ ] Replace the missing fluid sim water with a vr-friendly alternative
+- [ ] Automatically copy SteamVR StreamingAssets
+
+- [ ] Move phone UI to world space
+- [ ] Move computer UI to world space
+- [ ] Move client dialogue UI to world space
 
 # Complete
 

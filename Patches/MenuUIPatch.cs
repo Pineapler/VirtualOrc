@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using DG.Tweening;
+using HarmonyLib;
 using UnityEngine;
 using VirtualOrc.Scripts;
 
@@ -30,7 +31,14 @@ public class MenuUIPatch {
         RuntimeVRLoaderManager.OnReady(() => {
             var canvas = __instance.StartCanvas.GetComponent<Canvas>();
             canvas.worldCamera = Plugin.VrInputModule.uiCamera;
-            // canvas.gameObject.AddComponent<VrUIItem>();
+            canvas.gameObject.AddComponent<VrUIItem>();
         });
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(StartSceneUIManager), nameof(StartSceneUIManager.UIOnEnter))]
+    private static bool UIOnEnterFix(StartSceneUIManager __instance, Transform target) {
+        __instance.selected.transform.DOLocalMoveY(target.localPosition.y, 0.1f).SetEase(__instance.moveEase);
+        return false;
     }
 }

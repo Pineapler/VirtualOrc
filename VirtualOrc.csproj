@@ -58,6 +58,9 @@
     <Reference Include="Unity.RenderPipelines.Universal.Runtime">
       <HintPath>Libs\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="DG.Tweening">
+      <HintPath>Libs\DOTween.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   
