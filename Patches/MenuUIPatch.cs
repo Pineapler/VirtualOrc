@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using UnityEngine;
-using UnityEngine.UI;
 using VirtualOrc.Scripts;
 
 namespace VirtualOrc.Patches;
@@ -14,12 +13,12 @@ public class MenuUIPatch {
     [HarmonyPostfix]
     [HarmonyPatch(typeof(StartSceneUIManager), "Start")]
     private static void StartSceneToWorldSpace(StartSceneUIManager __instance) {
-        VrRig.OnReady(() => {
+        RuntimeVRLoaderManager.OnReady(() => {
             Canvas canvas = __instance.StartCanvas.GetComponent<Canvas>();
             canvas.name = "StartSceneCanvas";
             canvas.renderMode = RenderMode.WorldSpace;
             Transform t = canvas.transform;
-            t.SetParent(VrRig.Instance.canvasHolder.transform, false);
+            t.SetParent(Plugin.VrRig.canvasHolder.transform, false);
             t.localPosition = Vector3.zero;
         });
         
@@ -27,11 +26,11 @@ public class MenuUIPatch {
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(StartSceneUIManager), "Start")]
-    private static void AddWorldspaceUIHitboxes() {
-        var buttons = Object.FindObjectsOfType<Button>(true);
-        
-        foreach (Button button in buttons) {
-            button.gameObject.AddComponent<VrUIItem>();
-        }
+    private static void AddWorldspaceUIHitbox(StartSceneUIManager __instance) {
+        RuntimeVRLoaderManager.OnReady(() => {
+            var canvas = __instance.StartCanvas.GetComponent<Canvas>();
+            canvas.worldCamera = Plugin.VrInputModule.uiCamera;
+            // canvas.gameObject.AddComponent<VrUIItem>();
+        });
     }
 }

@@ -4,6 +4,7 @@ using System.Reflection;
 using Pineapler.Utils;
 using Unity.XR.OpenVR;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR;
 using UnityEngine.XR.Management;
 using Valve.VR;
@@ -13,6 +14,20 @@ namespace VirtualOrc.Scripts;
 public class RuntimeVRLoaderManager : MonoBehaviour {
 
     public static GameObject rigTarget;
+
+    private static bool _isReady;
+    private static UnityEvent _onReady = new();
+
+    
+    public static void OnReady(UnityAction action) {
+        if (_isReady) {
+            action.Invoke();
+            return;
+        }
+        
+        _onReady.AddListener(action);
+    }
+    
     
     private void Start() {
         StartCoroutine(InitializeVRLoader());
@@ -50,9 +65,15 @@ public class RuntimeVRLoaderManager : MonoBehaviour {
             yield return null;
         }
         
+        SteamVR_Actions._default.Activate();
+        
         Log.Info("Inserting VR rig");
         rigTarget.AddComponent<VrRig>();
 
+
+        _isReady = true;
+        _onReady?.Invoke();
+        _onReady?.RemoveAllListeners();
         yield return null;
     }
 
@@ -70,5 +91,7 @@ public class RuntimeVRLoaderManager : MonoBehaviour {
         
         return true;
     }
+    
+    
 }
 // ==========================================================

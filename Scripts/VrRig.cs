@@ -2,28 +2,18 @@
 using Cinemachine;
 using Pineapler.Utils;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SpatialTracking;
 
 using Valve.VR;
-using Valve.VR.Extras;
 
 namespace VirtualOrc.Scripts;
 
 public class VrRig : MonoBehaviour {
-    public static VrRig Instance;
     
     // SETTINGS
-    public bool autoRecentre = true;
-    public float autoRecentreDistance = 0.5f;
-    public float canvasDistance = 1f;
-    public float canvasScaleFactor = 0.00075f;
     // ========
-    
-
-    private static UnityEvent _onReady = new();
-    private static bool _isReady = false;
     
     public Transform rigRoot;
     public Transform rigOffset;
@@ -51,23 +41,13 @@ public class VrRig : MonoBehaviour {
     //      |--- xrControllerL
     //      |--- xrControllerR
 
-    public static void OnReady(UnityAction action) {
-        if (_isReady) {
-            action.Invoke();
-            return;
-        }
-        
-        _onReady.AddListener(action);
-    }
-    
     
     private void Awake() {
-        if (Instance != null) {
+        if (Plugin.VrRig != null) {
             Destroy(this);
             return;
         }
-        Instance = this;
-        
+        Plugin.VrRig = this;
         
         Log.Info("Initializing VR Rig");
 
@@ -82,37 +62,21 @@ public class VrRig : MonoBehaviour {
         
         SetupControllers();
 
-        FixCameraManagerRefs();
+        Recentre();
 
-        FixBodyStateRenderCam();
-
-        FixInteractableHintUI();
-
-        InitInputActions();
-
-        _isReady = true;
-        _onReady?.Invoke();
-        _onReady?.RemoveAllListeners();
     }
 
-
-
-    private void InitInputActions() {
-        Log.Info("Activating input actions");
-       
-        SteamVR_Actions._default.Activate();
-        
-    }
-
+    
     public void Recentre() {
         rigOffset.transform.position += rigRoot.transform.position - headsetObj.transform.position;
     }
 
+    
     private void Update() {
         Vector3 offset = rigRoot.transform.position - headsetObj.transform.position;
         
-        if (autoRecentre) {
-            if (offset.sqrMagnitude > autoRecentreDistance * autoRecentreDistance) {
+        if (Config.EnableAutoRecentre && Config.EnableHeadsetTracking) {
+            if (offset.sqrMagnitude > Config.AutoRecentreDistance * Config.AutoRecentreDistance) {
                 Recentre();
             }
         }
@@ -126,8 +90,8 @@ public class VrRig : MonoBehaviour {
         canvasHolder = new GameObject("CanvasHolder");
         canvasHolder.layer = LayerMask.NameToLayer("UI");
         canvasHolder.transform.SetParent(cineObj.transform, false);
-        canvasHolder.transform.localPosition = new Vector3(0, 0, canvasDistance);
-        canvasHolder.transform.localScale = new Vector3(canvasScaleFactor, canvasScaleFactor, 1);
+        canvasHolder.transform.localPosition = new Vector3(0, 0, Config.CanvasDistance);
+        canvasHolder.transform.localScale = new Vector3(Config.CanvasScaleFactor, Config.CanvasScaleFactor, 1);
     }
 
     private void SeparateCinemachineBrain() {
@@ -175,7 +139,9 @@ public class VrRig : MonoBehaviour {
         rigOffset.SetParent(rigRoot, false);
         
         headsetObj.transform.SetParent(rigOffset, false);
-        var headsetDriver = headsetObj.AddComponent<TrackedPoseDriver>();
+        if (Config.EnableHeadsetTracking) {
+            var headsetDriver = headsetObj.AddComponent<TrackedPoseDriver>();
+        }
     }
 
     private void SetupControllers() {
@@ -193,32 +159,11 @@ public class VrRig : MonoBehaviour {
         var rightDriver = rightController.AddComponent<TrackedPoseDriver>();
         rightDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRController, TrackedPoseDriver.TrackedPose.RightPose);
 
-        var leftLaser = leftController.AddComponent<LaserUIInput>();
+        var leftLaser = leftController.AddComponent<VrLaser>();
         leftLaser.inputHand = SteamVR_Input_Sources.LeftHand;
-        var rightLaser = rightController.AddComponent<LaserUIInput>();
+        var rightLaser = rightController.AddComponent<VrLaser>();
         rightLaser.inputHand = SteamVR_Input_Sources.RightHand;
-        
-    }
-    
-    private void FixCameraManagerRefs() {
-        cameraManager = FindObjectOfType<CameraManager>();
-        cameraManager.Cameras.Add(cineObj);
-        cameraManager.MainCam = cineObj;
-        cameraManager.MainCamOrbit = cineObj.GetComponent<CameraOrbit>();
-    }
-    
-    private void FixBodyStateRenderCam() {
-        FieldInfo mainCamField = typeof(BodyStateRenderCam).GetField("mainCam", BindingFlags.Instance | BindingFlags.NonPublic);
-        foreach (BodyStateRenderCam bsrc in FindObjectsOfType<BodyStateRenderCam>()) {
-            Log.Info($"Setting {bsrc}.mainCam to headsetCam");
-            mainCamField.SetValue(bsrc, headsetCam);
-        }
-    }
 
-    private void FixInteractableHintUI() {
-        FieldInfo camField = typeof(InteractableHintUI).GetField("cam", BindingFlags.Instance | BindingFlags.NonPublic);
-        foreach (InteractableHintUI ui in FindObjectsOfType<InteractableHintUI>()) {
-            camField.SetValue(ui, headsetCam);
-        }
     }
+    
 }

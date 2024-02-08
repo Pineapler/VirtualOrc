@@ -34,8 +34,8 @@ public class CameraManagerPatch {
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CameraManager), nameof(CameraManager.SetActiveCamera))]
     private static void RecentreOnSetActiveCamera(CameraManager __instance, GameCameraType ActiveCamera) {
-        if (VrRig.Instance == null) return;
+        if (Plugin.VrRig == null) return;
         
-        VrRig.Instance.Recentre();
+        Plugin.VrRig.Recentre();
     }
 }

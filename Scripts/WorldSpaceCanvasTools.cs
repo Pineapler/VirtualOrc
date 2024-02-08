@@ -12,6 +12,7 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
     // public Quaternion billboardOffsetRotation;
     
     private void LateUpdate() {
+        if (Plugin.VrRig == null) return;
         Billboard();
         // PerspectiveScale();
     }
@@ -20,7 +21,7 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
     private void Billboard() {
         if (!billboardEnabled || canvasTransform == null) return;
         
-        canvasTransform.rotation = Quaternion.LookRotation(VrRig.Instance.headsetObj.transform.position - canvasTransform.position, Vector3.up);
+        canvasTransform.rotation = Quaternion.LookRotation(Plugin.VrRig.headsetObj.transform.position - canvasTransform.position, Vector3.up);
     }
 
     
