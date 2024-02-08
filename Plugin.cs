@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Valve.VR;
 using VirtualOrc.Scripts;
+using Input = VirtualOrc.Scripts.Input;
 
 namespace VirtualOrc;
 
@@ -61,8 +62,6 @@ public class Plugin : BaseUnityPlugin {
     public static VrRig VrRig;
     public static VrInputModule VrInputModule;
     public static StandaloneInputModule OldInputModule;
-
-    public SteamVR_Action_Boolean toggleUIAction;
    
     public CameraManager cameraManager;
     
@@ -73,8 +72,9 @@ public class Plugin : BaseUnityPlugin {
 
     
     public void AfterVrLoaded() {
-        toggleUIAction = SteamVR_Actions._default.ToggleUI;
-        toggleUIAction.AddOnStateDownListener(OnToggleUI, SteamVR_Input_Sources.Any);
+        Input.Init();
+        
+        Input.toggleUI.AddOnStateDownListener(OnToggleUI, SteamVR_Input_Sources.Any);
         
         InsertVrInputModule();
         

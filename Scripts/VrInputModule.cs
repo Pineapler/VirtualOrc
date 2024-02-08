@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Valve.VR;
+using Input = VirtualOrc.Scripts.Input;
 
 namespace VirtualOrc.Scripts;
 
@@ -14,7 +15,6 @@ public class VrInputModule : BaseInputModule {
     public Camera uiCamera;
 
     public SteamVR_Input_Sources targetSource;
-    public SteamVR_Action_Boolean clickAction;
 
     private bool _wishClickDown = false;
     private bool _wishClickUp = false;
@@ -41,8 +41,6 @@ public class VrInputModule : BaseInputModule {
         
         Log.Info("Initializing VR Input Module");
         eventData = new PointerEventData(eventSystem);
-
-        clickAction = SteamVR_Actions._default.Interact;
 
         uiCamera.transform.SetParent(transform, false);
         
@@ -132,10 +130,10 @@ public class VrInputModule : BaseInputModule {
     public void SetActiveLaser(VrLaser laser) {
         if (laser == activeLaser) return;
         
-        clickAction.RemoveOnStateDownListener(OnInteractDown, SteamVR_Input_Sources.LeftHand);
-        clickAction.RemoveOnStateDownListener(OnInteractDown, SteamVR_Input_Sources.RightHand);
-        clickAction.RemoveOnStateUpListener(OnInteractUp, SteamVR_Input_Sources.LeftHand);
-        clickAction.RemoveOnStateUpListener(OnInteractUp, SteamVR_Input_Sources.RightHand);
+        Input.interact.RemoveOnStateDownListener(OnInteractDown, SteamVR_Input_Sources.LeftHand);
+        Input.interact.RemoveOnStateDownListener(OnInteractDown, SteamVR_Input_Sources.RightHand);
+        Input.interact.RemoveOnStateUpListener(OnInteractUp, SteamVR_Input_Sources.LeftHand);
+        Input.interact.RemoveOnStateUpListener(OnInteractUp, SteamVR_Input_Sources.RightHand);
 
         if (activeLaser != null) {
             activeLaser.pointer.gameObject.SetActive(false);
@@ -150,8 +148,8 @@ public class VrInputModule : BaseInputModule {
         isActive = true;
 
         activeLaser = laser;
-        clickAction.AddOnStateDownListener(OnInteractDown, activeLaser.inputHand);
-        clickAction.AddOnStateUpListener(OnInteractUp, activeLaser.inputHand);
+        Input.interact.AddOnStateDownListener(OnInteractDown, activeLaser.inputHand);
+        Input.interact.AddOnStateUpListener(OnInteractUp, activeLaser.inputHand);
         
         activeLaser.pointer.gameObject.SetActive(true);
         Transform t = uiCamera.transform;

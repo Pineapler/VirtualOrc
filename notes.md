@@ -8,15 +8,21 @@
 
 # Backlog
 
-- [ ] Change raycast mechanism to use controller
-- [ ] Hook the SteamVR recentre event and apply our own `VrRig().Recentre`. Also do Y rotation.
+### Bugs 
+
 - [ ] Fix LogSystemManager properly. Currently disabled the UI so that it's not cluttering the screen.
 - [ ] Replace the missing fluid sim water with a vr-friendly alternative
-- [ ] Automatically copy SteamVR StreamingAssets
 
+### UI
+ 
 - [ ] Move phone UI to world space
 - [ ] Move computer UI to world space
 - [ ] Move client dialogue UI to world space
+
+### Unity/BepInEx/Asset specific
+- [ ] Hook the SteamVR recentre event and apply our own `VrRig().Recentre`. Also do Y rotation.
+- [ ] Automatically copy SteamVR StreamingAssets to game directory
+
 
 # Complete
 
