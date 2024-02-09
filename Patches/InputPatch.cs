@@ -16,11 +16,10 @@ public class InputPatch {
     // ============
     // InputManager
     // ============
-
+    #region
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InputManager), "SexInput")]
     private static bool InputManager_SexInputVR(InputManager __instance) {
-        
         // Fallback to original implementation
         if (VRInputModule.Instance == null || !VRInputModule.Instance.isLaserActive) return true;
         
@@ -60,13 +59,14 @@ public class InputPatch {
         Transform laserT = VRInputModule.Instance.activeLaser.transform;
         Ray ray = new Ray(laserT.position, laserT.forward);
         if (Physics.Raycast(ray, out __instance.hit, 100f, (int)__instance.mask) &&
-            Input.InteractLaserPressed() &&
             !EventSystem.current.IsPointerOverGameObject()) {
 
-            if (__instance.hit.collider.TryGetComponent(out __instance.LastworldSpaceButton)) {
-                __instance.LastworldSpaceButton.Down();
-                if (__instance.LastworldSpaceButton.HasWindow) {
-                    __instance.gm.SetGameMode(GameMode.mode.OnWindow);
+            if (Input.InteractLaserPressed()) {
+                if (__instance.hit.collider.TryGetComponent(out __instance.LastworldSpaceButton)) {
+                    __instance.LastworldSpaceButton.Down();
+                    if (__instance.LastworldSpaceButton.HasWindow) {
+                        __instance.gm.SetGameMode(GameMode.mode.OnWindow);
+                    }
                 }
             }
 
@@ -110,19 +110,19 @@ public class InputPatch {
         
         return false;
     }
-    
+    #endregion
     
     // ==================
     // MouseCursorManager
     // ==================
-    
-    
+    #region
     public static PropertyInfo mcm_hitProp;
     public static PropertyInfo mcm_lastRaycastableProp;
     
     [HarmonyPrefix]
     [HarmonyPatch(typeof(MouseCursorManager), "MassageInput")]
     private static bool MouseCursorManager_MassageInputVR(MouseCursorManager __instance) {
+        Log.Info("MouseCursor MassageInput");
         if (VRInputModule.Instance == null || !VRInputModule.Instance.isLaserActive) return true;
         
         Log.Info("Hello");
@@ -171,4 +171,7 @@ public class InputPatch {
 
         return false;
     }
+    
+    #endregion
+    
 }
