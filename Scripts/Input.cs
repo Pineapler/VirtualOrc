@@ -2,7 +2,7 @@
 
 namespace VirtualOrc.Scripts;
 
-public class Input {
+public static class Input {
 
     public static SteamVR_Action_Boolean interact;
     public static SteamVR_Action_Boolean interactSecondary;
@@ -21,6 +21,7 @@ public class Input {
     }
     
     public static bool InteractLaserPressed() {
-        return interact.GetStateDown(Plugin.VrInputModule.targetSource);
+        if (VRInputModule.Instance == null) return false;
+        return interact.GetStateDown(VRInputModule.Instance.targetSource);
     }
 }

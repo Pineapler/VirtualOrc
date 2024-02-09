@@ -5,7 +5,7 @@ using UnityEngine;
 namespace VirtualOrc.Patches;
 
 [HarmonyPatch]
-public class ZibraLiquidToolPatch {
+public class IncompatibleSystemsPatch {
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ZibraLiquidTool), "Awake")]

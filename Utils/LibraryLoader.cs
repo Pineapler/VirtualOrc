@@ -25,13 +25,13 @@ public static class LibraryLoader {
                     continue;
                 }
 
-                Log.Info($"Early loading {filename}");
+                Log.Info($"  Early loading {filename}");
 
                 try {
                     Assembly.LoadFile(file);
                 }
                 catch (Exception ex) {
-                    Log.Warning($"Failed to early load {filename}: {ex.Message}");
+                    Log.Error($"Failed to early load {filename}: {ex.Message}");
                 }
             }
         }

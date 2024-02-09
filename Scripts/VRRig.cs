@@ -2,7 +2,7 @@
 using Cinemachine;
 using Pineapler.Utils;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.Events;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SpatialTracking;
 
@@ -10,10 +10,20 @@ using Valve.VR;
 
 namespace VirtualOrc.Scripts;
 
-public class VrRig : MonoBehaviour {
+public class VRRig : MonoBehaviour {
+
+    private static UnityEvent _onReady = new();
+    private static bool _ready;
+    public static void OnReady(UnityAction onReady) {
+        if (_ready) {
+            onReady?.Invoke();
+            return;
+        }
+        
+        _onReady.AddListener(onReady);
+    }
     
-    // SETTINGS
-    // ========
+    public static VRRig Instance;
     
     public Transform rigRoot;
     public Transform rigOffset;
@@ -43,11 +53,14 @@ public class VrRig : MonoBehaviour {
 
     
     private void Awake() {
-        if (Plugin.VrRig != null) {
+        if (Instance != null) {
+            // Log.Warning("VRRig: Too many instances!");
+            // This is expected, we make a copy of this gameObject while setting up the rig
+            // Should probably fix this by moving the rig script off the main camera.
             Destroy(this);
             return;
         }
-        Plugin.VrRig = this;
+        Instance = this;
         
         Log.Info("Initializing VR Rig");
 
@@ -62,22 +75,43 @@ public class VrRig : MonoBehaviour {
         
         SetupControllers();
 
-        Recentre();
-
+        Recenter();
     }
 
+    private void Start() {
+        Log.Info("VR Rig ready");
+        _ready = true;
+        _onReady?.Invoke();
+        _onReady?.RemoveAllListeners();
+    }
+
+    private void OnDestroy() {
+        if (Instance == this) {
+            Instance = null;
+        }
+        
+        _ready = false;
+        _onReady?.RemoveAllListeners();
+    }
+
+
     
-    public void Recentre() {
+    public void Recenter() {
         rigOffset.transform.position += rigRoot.transform.position - headsetObj.transform.position;
+        
+        if (Plugin.Config.EnableHeadsetTracking.Value == false) {
+            rigOffset.transform.rotation = cineCam.transform.rotation;
+        }
     }
 
     
     private void Update() {
         Vector3 offset = rigRoot.transform.position - headsetObj.transform.position;
         
-        if (Config.EnableAutoRecentre && Config.EnableHeadsetTracking) {
-            if (offset.sqrMagnitude > Config.AutoRecentreDistance * Config.AutoRecentreDistance) {
-                Recentre();
+        if (Plugin.Config.EnableAutoRecenter.Value && Plugin.Config.EnableHeadsetTracking.Value) {
+            // Recenter if offset is larger than our threshold
+            if (offset.sqrMagnitude > Plugin.Config.AutoRecenterDistance.Value * Plugin.Config.AutoRecenterDistance.Value) {
+                Recenter();
             }
         }
     }
@@ -90,8 +124,8 @@ public class VrRig : MonoBehaviour {
         canvasHolder = new GameObject("CanvasHolder");
         canvasHolder.layer = LayerMask.NameToLayer("UI");
         canvasHolder.transform.SetParent(cineObj.transform, false);
-        canvasHolder.transform.localPosition = new Vector3(0, 0, Config.CanvasDistance);
-        canvasHolder.transform.localScale = new Vector3(Config.CanvasScaleFactor, Config.CanvasScaleFactor, 1);
+        canvasHolder.transform.localPosition = new Vector3(0, 0, Plugin.Config.CanvasDistance.Value);
+        canvasHolder.transform.localScale = new Vector3(Plugin.Config.CanvasScaleFactor, Plugin.Config.CanvasScaleFactor, 1);
     }
 
     private void SeparateCinemachineBrain() {
@@ -139,9 +173,12 @@ public class VrRig : MonoBehaviour {
         rigOffset.SetParent(rigRoot, false);
         
         headsetObj.transform.SetParent(rigOffset, false);
-        if (Config.EnableHeadsetTracking) {
-            var headsetDriver = headsetObj.AddComponent<TrackedPoseDriver>();
+        var headsetDriver = headsetObj.AddComponent<TrackedPoseDriver>();
+        if (Plugin.Config.EnableHeadsetTracking.Value == false) {
+            headsetDriver.enabled = false;
         }
+        
+        Recenter();
     }
 
     private void SetupControllers() {
@@ -159,9 +196,9 @@ public class VrRig : MonoBehaviour {
         var rightDriver = rightController.AddComponent<TrackedPoseDriver>();
         rightDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRController, TrackedPoseDriver.TrackedPose.RightPose);
 
-        var leftLaser = leftController.AddComponent<VrLaser>();
+        var leftLaser = leftController.AddComponent<VRLaser>();
         leftLaser.inputHand = SteamVR_Input_Sources.LeftHand;
-        var rightLaser = rightController.AddComponent<VrLaser>();
+        var rightLaser = rightController.AddComponent<VRLaser>();
         rightLaser.inputHand = SteamVR_Input_Sources.RightHand;
 
     }

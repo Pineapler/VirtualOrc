@@ -1,13 +1,13 @@
 ﻿using System.Collections;
-using Pineapler.Utils;
 using UnityEngine;
 using Valve.VR;
 using Valve.VR.Extras;
 
 namespace VirtualOrc.Scripts;
 
-public class VrLaser : MonoBehaviour {
+public class VRLaser : MonoBehaviour {
     public Color laserColor = new (0.5f, 0.8f, 0.6f);
+    public Color laserColorClick = new (0.7f, 0.9f, 0.8f);
     
     public SteamVR_Action_Boolean uiSelectAction;
     public SteamVR_Input_Sources inputHand;
@@ -19,12 +19,13 @@ public class VrLaser : MonoBehaviour {
     }
     
     private IEnumerator Start() {
-        yield return 0;
+        yield return 0; // Wait for pointer to set itself up. Could implement custom logic instead.
         uiSelectAction = SteamVR_Actions._default.Interact;
         
         pointer = gameObject.GetComponent<SteamVR_LaserPointer>();
         pointer.interactWithUI = uiSelectAction;
         pointer.color = laserColor;
+        pointer.clickColor = laserColorClick;
        
         // Change the InputModule to the hand that pressed trigger last
         uiSelectAction.RemoveOnStateDownListener(OnPointerClickNotEnabled, SteamVR_Input_Sources.LeftHand);
@@ -37,15 +38,10 @@ public class VrLaser : MonoBehaviour {
         pointer.pointer.layer = LayerMask.NameToLayer("UI");
     }
 
-    private void Update() {
-        
-    }
-
     private void OnPointerClickNotEnabled(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource) {
-        if (fromSource != inputHand || !Config.EnableLaserInput) return;
-
-        if (Plugin.VrInputModule.activeLaser != this) {
-            Plugin.VrInputModule.SetActiveLaser(this);
-        }
+        if (fromSource != inputHand || !VRInputModule.Instance.isLaserActive) return;
+        if (VRInputModule.Instance.activeLaser == this) return;
+        
+        VRInputModule.Instance.SetActiveLaser(this);
     }
 }

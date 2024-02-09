@@ -1,5 +1,7 @@
-﻿using HarmonyLib;
+﻿using System.Reflection;
+using HarmonyLib;
 using Kuro;
+using Pineapler.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VirtualOrc.Scripts;
@@ -8,20 +10,23 @@ using Input = VirtualOrc.Scripts.Input;
 namespace VirtualOrc.Patches;
 
 [HarmonyPatch]
-public class InputManagerPatch {
+public class InputPatch {
     // TODO: These should probably be replaced with hand tracked stuff
 
+    // ============
+    // InputManager
+    // ============
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InputManager), "SexInput")]
-    private static bool SexInputVR(InputManager __instance) {
+    private static bool InputManager_SexInputVR(InputManager __instance) {
         
         // Fallback to original implementation
-        if (!Config.EnableLaserInput || Plugin.VrInputModule == null) return true;
+        if (VRInputModule.Instance == null || !VRInputModule.Instance.isLaserActive) return true;
         
         // Same as original, but replace screen point with a raycast from the laser,
         // and check for interact action instead of mouse.
-        Transform laserT = Plugin.VrInputModule.activeLaser.transform;
+        Transform laserT = VRInputModule.Instance.activeLaser.transform;
         Ray ray = new Ray(laserT.position, laserT.forward);
         if (Physics.Raycast(ray, out __instance.hit, 100f, (int)__instance.SexSceneMask) &&
             Input.InteractLaserPressed() &&
@@ -49,10 +54,10 @@ public class InputManagerPatch {
     
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InputManager), "OperatingInput")]
-    private static bool OperatingInputVR(InputManager __instance) {
-        if (!Config.EnableLaserInput || Plugin.VrInputModule == null) return true;
+    private static bool InputManager_OperatingInputVR(InputManager __instance) {
+        if (VRInputModule.Instance == null || !VRInputModule.Instance.isLaserActive) return true;
         
-        Transform laserT = Plugin.VrInputModule.activeLaser.transform;
+        Transform laserT = VRInputModule.Instance.activeLaser.transform;
         Ray ray = new Ray(laserT.position, laserT.forward);
         if (Physics.Raycast(ray, out __instance.hit, 100f, (int)__instance.mask) &&
             Input.InteractLaserPressed() &&
@@ -91,10 +96,10 @@ public class InputManagerPatch {
     
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InputManager), "MassaggingInput")]
-    private static bool MassagingInputVR(InputManager __instance) {
-        if (!Config.EnableLaserInput || Plugin.VrInputModule == null) return true;
+    private static bool InputManager_MassagingInputVR(InputManager __instance) {
+        if (VRInputModule.Instance == null || !VRInputModule.Instance.isLaserActive) return true;
         
-        Transform laserT = Plugin.VrInputModule.activeLaser.transform;
+        Transform laserT = VRInputModule.Instance.activeLaser.transform;
         Ray ray = new Ray(laserT.position, laserT.forward);
         if (Physics.Raycast(ray, out __instance.hit, 100f, (int)__instance.MassageGameMask) &&
             Input.InteractLaserPressed() &&
@@ -107,4 +112,63 @@ public class InputManagerPatch {
     }
     
     
+    // ==================
+    // MouseCursorManager
+    // ==================
+    
+    
+    public static PropertyInfo mcm_hitProp;
+    public static PropertyInfo mcm_lastRaycastableProp;
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(MouseCursorManager), "MassageInput")]
+    private static bool MouseCursorManager_MassageInputVR(MouseCursorManager __instance) {
+        if (VRInputModule.Instance == null || !VRInputModule.Instance.isLaserActive) return true;
+        
+        Log.Info("Hello");
+
+        if (mcm_hitProp == null) {
+            mcm_hitProp = typeof(MouseCursorManager).GetProperty("hit", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            mcm_lastRaycastableProp = typeof(MouseCursorManager).GetProperty("lastRaycastable", BindingFlags.Public | BindingFlags.Instance)!;
+        }
+
+        Transform laserT = VRInputModule.Instance.activeLaser.transform;
+        Ray ray = new Ray(laserT.position, laserT.forward);
+        RaycastHit hitTemp;
+        if (Physics.Raycast(ray, out hitTemp, 100f, (int)__instance.mask) &&
+            !EventSystem.current.IsPointerOverGameObject()) {
+
+            mcm_hitProp.SetValue(__instance, hitTemp);
+
+            ISelectable component;
+            if (!hitTemp.collider.TryGetComponent(out component)) {
+                return false;
+            }
+
+            if (__instance.lastRaycastable != null) {
+                __instance.lastRaycastable.Exit();
+            }
+            mcm_lastRaycastableProp.SetValue(__instance, component);
+            __instance.lastRaycastable!.Enter();
+            
+            MouseCursorManager.SwitchState(MouseCursorManager.MouseState.Hovering);
+            if (!Input.InteractLaserPressed()) {
+                return false;
+            }
+
+            __instance.lastRaycastable.Select();
+            MouseCursorManager.SwitchState(MouseCursorManager.MouseState.Pressing);
+        }
+        else {
+            if (__instance.lastRaycastable == null) {
+                return false;
+            }
+
+            __instance.lastRaycastable.Exit();
+            mcm_lastRaycastableProp.SetValue(__instance, null);
+            MouseCursorManager.SwitchState(MouseCursorManager.MouseState.Normal);
+        }
+
+        return false;
+    }
 }

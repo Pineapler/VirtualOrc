@@ -1,34 +1,36 @@
 ﻿using Pineapler.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using Valve.VR;
-using Input = VirtualOrc.Scripts.Input;
 
 namespace VirtualOrc.Scripts;
 
-public class VrInputModule : BaseInputModule {
-    public bool isActive = true;
-
-    public BaseInputModule oldInputModule;
+public class VRInputModule : BaseInputModule {
+    public static VRInputModule Instance;
     
-    public VrLaser activeLaser { get; private set; }
+    public bool isLaserActive = true;
+
+    public VRLaser activeLaser { get; private set; }
     public Camera uiCamera;
 
     public SteamVR_Input_Sources targetSource;
 
     private bool _wishClickDown = false;
     private bool _wishClickUp = false;
+    private int _laserUserCount = 0;
 
     public GameObject currentObject;
     public PointerEventData eventData { get; private set; }
 
 
     protected override void Awake() {
-        if (Plugin.VrInputModule != null) {
+        if (Instance != null) {
+            Log.Warning("VRInputModule: Too many instances!");
             Destroy(this);
             return;
         }
-        Plugin.VrInputModule = this;
+        Instance = this;
         base.Awake();
 
         uiCamera = new GameObject("LaserCamera").AddComponent<Camera>();
@@ -36,8 +38,6 @@ public class VrInputModule : BaseInputModule {
     
     protected override void Start() {
         base.Start();
-        oldInputModule = FindObjectOfType<StandaloneInputModule>();
-        oldInputModule.enabled = !Config.EnableLaserInput;
         
         Log.Info("Initializing VR Input Module");
         eventData = new PointerEventData(eventSystem);
@@ -54,6 +54,13 @@ public class VrInputModule : BaseInputModule {
         uiCamera.enabled = false;
     }
 
+    protected override void OnDestroy() {
+        if (Instance == this) {
+            Instance = null;
+        }
+        base.OnDestroy();
+    }
+
     public void OnInteractDown(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource) {
         _wishClickDown = true;
     }
@@ -64,7 +71,7 @@ public class VrInputModule : BaseInputModule {
 
 
     public override void Process() {
-        if (isActive == false || !Config.EnableLaserInput) return;
+        if (isLaserActive == false) return;
         
         // Reset data
         eventData.Reset();
@@ -127,8 +134,9 @@ public class VrInputModule : BaseInputModule {
     }
 
     
-    public void SetActiveLaser(VrLaser laser) {
+    public void SetActiveLaser(VRLaser laser) {
         if (laser == activeLaser) return;
+        if (laser == null) return;
         
         Input.interact.RemoveOnStateDownListener(OnInteractDown, SteamVR_Input_Sources.LeftHand);
         Input.interact.RemoveOnStateDownListener(OnInteractDown, SteamVR_Input_Sources.RightHand);
@@ -138,14 +146,6 @@ public class VrInputModule : BaseInputModule {
         if (activeLaser != null) {
             activeLaser.pointer.gameObject.SetActive(false);
         }
-        
-        if (laser == null) {
-            activeLaser = null;
-            isActive = false;
-            return;
-        }
-       
-        isActive = true;
 
         activeLaser = laser;
         Input.interact.AddOnStateDownListener(OnInteractDown, activeLaser.inputHand);
@@ -156,6 +156,30 @@ public class VrInputModule : BaseInputModule {
         t.SetParent(activeLaser.transform, false);
         
         targetSource = activeLaser.inputHand;
+    }
+
+    public void PushLaserContext() {
+        if (_laserUserCount <= 0) {
+            _laserUserCount = 1;
+            isLaserActive = true;
+            if (activeLaser != null) {
+                activeLaser.pointer.gameObject.SetActive(true);
+            }
+            return;
+        }
+        
+        _laserUserCount += 1;
+    }
+
+    public void PopLaserContext() {
+        _laserUserCount -= 1;
+        if (_laserUserCount > 0) return;
+        
+        _laserUserCount = 0;
+        isLaserActive = false;
+        if (activeLaser != null) {
+            activeLaser.pointer.gameObject.SetActive(false);
+        }
     }
 
 }
