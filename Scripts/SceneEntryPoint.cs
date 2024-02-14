@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using Pineapler.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -36,7 +35,10 @@ public class SceneEntryPoint : MonoBehaviour {
 
 
     public void AfterVrLoaded() {
+        Input.toggleUI.RemoveOnStateDownListener(OnToggleUI, SteamVR_Input_Sources.Any);
         Input.toggleUI.AddOnStateDownListener(OnToggleUI, SteamVR_Input_Sources.Any);
+        Input.pause.RemoveOnStateDownListener(OnPause, SteamVR_Input_Sources.Any);
+        Input.pause.AddOnStateDownListener(OnPause, SteamVR_Input_Sources.Any);
         
         InsertVrInputModule();
 
@@ -83,6 +85,13 @@ public class SceneEntryPoint : MonoBehaviour {
         
         VRInputModule.Instance.enabled = VRInputModule.Instance.isLaserActive;
         oldInputModule.enabled = !VRInputModule.Instance.isLaserActive;
+    }
+
+
+    public void OnPause(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource) {
+        if (OptionMenu.Instance != null) {
+            OptionMenu.Instance.ToggleCanvas();
+        }
     }
 
 }

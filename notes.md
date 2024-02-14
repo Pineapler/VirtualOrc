@@ -55,3 +55,6 @@
 - TrainingGame.cs is the main massage script I think
 - CubeMassageGame.cs
 - WeakPoint.cs might need patching, might be ok
+
+- Pause menu is a bit bugged but it mostly works. Should probably revisit it later.
+  - Sliders don't work

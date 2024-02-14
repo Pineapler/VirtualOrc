@@ -12,7 +12,7 @@ public class VRInputModule : BaseInputModule {
     public bool isLaserActive = true;
 
     public VRLaser activeLaser { get; private set; }
-    public Camera uiCamera;
+    [FormerlySerializedAs("uiCamera")] public Camera laserCamera;
 
     public SteamVR_Input_Sources targetSource;
 
@@ -33,7 +33,7 @@ public class VRInputModule : BaseInputModule {
         Instance = this;
         base.Awake();
 
-        uiCamera = new GameObject("LaserCamera").AddComponent<Camera>();
+        laserCamera = new GameObject("LaserCamera").AddComponent<Camera>();
     }
     
     protected override void Start() {
@@ -42,16 +42,16 @@ public class VRInputModule : BaseInputModule {
         Log.Info("Initializing VR Input Module");
         eventData = new PointerEventData(eventSystem);
 
-        uiCamera.transform.SetParent(transform, false);
+        laserCamera.transform.SetParent(transform, false);
         
-        uiCamera.clearFlags = CameraClearFlags.Nothing;
-        uiCamera.cullingMask = 0; // Don't draw anything
-        uiCamera.orthographic = true;
-        uiCamera.orthographicSize = 0.1f;
-        uiCamera.aspect = 1.0f;
-        uiCamera.nearClipPlane = 0.01f;
-        uiCamera.farClipPlane = 100f;
-        uiCamera.enabled = false;
+        laserCamera.clearFlags = CameraClearFlags.Nothing;
+        laserCamera.cullingMask = 0; // Don't draw anything
+        laserCamera.orthographic = true;
+        laserCamera.orthographicSize = 0.1f;
+        laserCamera.aspect = 1.0f;
+        laserCamera.nearClipPlane = 0.01f;
+        laserCamera.farClipPlane = 100f;
+        laserCamera.enabled = false;
     }
 
     protected override void OnDestroy() {
@@ -75,7 +75,7 @@ public class VRInputModule : BaseInputModule {
         
         // Reset data
         eventData.Reset();
-        eventData.position = new Vector2(uiCamera.pixelWidth, uiCamera.pixelHeight) / 2;
+        eventData.position = new Vector2(laserCamera.pixelWidth, laserCamera.pixelHeight) / 2;
         
         // raycast
         eventSystem.RaycastAll(eventData, m_RaycastResultCache);
@@ -152,7 +152,7 @@ public class VRInputModule : BaseInputModule {
         Input.interact.AddOnStateUpListener(OnInteractUp, activeLaser.inputHand);
         
         activeLaser.pointer.gameObject.SetActive(true);
-        Transform t = uiCamera.transform;
+        Transform t = laserCamera.transform;
         t.SetParent(activeLaser.transform, false);
         
         targetSource = activeLaser.inputHand;

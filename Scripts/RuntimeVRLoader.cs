@@ -96,7 +96,5 @@ public class RuntimeVRLoader : MonoBehaviour {
         
         return true;
     }
-    
-    
 }
 // ==========================================================

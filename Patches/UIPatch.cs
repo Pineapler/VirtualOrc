@@ -1,4 +1,5 @@
-﻿using DG.Tweening;
+﻿using System.Reflection;
+using DG.Tweening;
 using HarmonyLib;
 using Pineapler.Utils;
 using UnityEngine;
@@ -39,13 +40,13 @@ public class UIPatch {
             Canvas canvas = __instance.StartCanvas.GetComponent<Canvas>();
             canvas.name = "StartSceneCanvas";
             canvas.renderMode = RenderMode.WorldSpace;
-            canvas.worldCamera = VRInputModule.Instance.uiCamera;
+            canvas.worldCamera = VRInputModule.Instance.laserCamera;
             Transform t = canvas.transform;
             t.SetParent(VRRig.Instance.canvasHolder.transform, false);
             t.localPosition = Vector3.zero;
             
             var wsCanvasTools = canvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
-            wsCanvasTools.colliderEnabled = true;
+            wsCanvasTools.EnableCollider = true;
         });
         
     }
@@ -83,7 +84,7 @@ public class UIPatch {
         
         var wsCanvasTools = __instance.canvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
         // wsCanvasTools.targetRectTransform = __instance.holder.GetComponent<RectTransform>();
-        wsCanvasTools.targetRectTransform = __instance.canvas.GetComponent<RectTransform>();
+        wsCanvasTools.TargetRectTransform = __instance.canvas.GetComponent<RectTransform>();
         wsCanvasTools.enableBillboard = true;
         // wsCanvasTools.enablePerspectiveScale = true;
         // wsCanvasTools.perceivedScale = new Vector3(0.005f, 0.005f, 1);
@@ -114,7 +115,7 @@ public class UIPatch {
         canvasTransform.localPosition = Vector3.zero;
         canvasTransform.localScale = new Vector3(0.005f, 0.005f, 0.005f);
         var wsCanvasTools = __instance.gameObject.AddComponent<WorldSpaceCanvasTools>();
-        wsCanvasTools.targetRectTransform = __instance.hintPoint.GetComponent<RectTransform>();
+        wsCanvasTools.TargetRectTransform = __instance.hintPoint.GetComponent<RectTransform>();
         wsCanvasTools.enableBillboard = true;
         // wsCanvasTools.enablePerspectiveScale = true;
         // wsCanvasTools.perceivedScale = new Vector3(0.005f, 0.005f, 1);
@@ -140,7 +141,7 @@ public class UIPatch {
             Canvas canvas = UIManager.Instance.PhoneWindow.transform.parent.GetComponentInChildren<Canvas>(); // jesus christ
             canvas.name = "GameManager Canvas";
             canvas.renderMode = RenderMode.WorldSpace;
-            canvas.worldCamera = VRInputModule.Instance.uiCamera;
+            canvas.worldCamera = VRInputModule.Instance.laserCamera;
             Transform t = canvas.transform;
             t.SetParent(VRRig.Instance.canvasHolder.transform, false);
             t.localPosition = Vector3.zero;
@@ -151,7 +152,7 @@ public class UIPatch {
 
             foreach (Transform child in canvas.transform) {
                 var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
-                wsCanvasTools.colliderEnabled = true;
+                wsCanvasTools.EnableCollider = true;
             }
         });
     }
@@ -164,7 +165,7 @@ public class UIPatch {
             Canvas canvas = __instance.GetComponent<TalkManager>().talkWindow.transform.parent.GetComponent<Canvas>(); // jesus christ
             canvas.name = "TalkWindow Canvas";
             canvas.renderMode = RenderMode.WorldSpace;
-            canvas.worldCamera = VRInputModule.Instance.uiCamera;
+            canvas.worldCamera = VRInputModule.Instance.laserCamera;
             Transform t = canvas.transform;
             t.SetParent(VRRig.Instance.canvasHolder.transform, false);
             t.localPosition = Vector3.zero;
@@ -191,7 +192,7 @@ public class UIPatch {
             Canvas canvas = __instance.GetComponent<Canvas>();
             canvas.name = "DialogueManager Canvas";
             canvas.renderMode = RenderMode.WorldSpace;
-            canvas.worldCamera = VRInputModule.Instance.uiCamera;
+            canvas.worldCamera = VRInputModule.Instance.laserCamera;
             Transform t = canvas.transform;
             t.SetParent(VRRig.Instance.canvasHolder.transform, false);
             t.localPosition = Vector3.zero;
@@ -208,6 +209,52 @@ public class UIPatch {
     }
     #endregion
 
+    // ==========
+    // OptionMenu
+    // ==========
+    #region OptionMenu
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OptionMenu), "Start")]
+    private static void OptionMenu_ToWorldSpace(OptionMenu __instance) {
+        FieldInfo canvasField = typeof(OptionMenu).GetField("canvas", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        
+        VRRig.OnReady(() => {
+            Canvas pauseCanvas = (canvasField.GetValue(__instance) as Canvas)!;
+            Canvas skipCanvas = __instance.skipManga.GetComponent<Canvas>();
+
+            Transform holderT = VRRig.Instance.canvasHolder.transform;
+            Transform pauseT = pauseCanvas.transform;
+            Transform skipT = skipCanvas.transform;
+
+            skipT.SetParent(holderT, false);
+            pauseCanvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
+            pauseCanvas.renderMode = RenderMode.WorldSpace;
+            pauseCanvas.worldCamera = VRInputModule.Instance.laserCamera;
+            pauseT.name = "Pause Canvas";
+            pauseT.localPosition = new Vector3(0, 0, -100f);
+            pauseT.localRotation = Quaternion.identity;
+            pauseT.localScale = Vector3.one;
+            var pauseWS = pauseCanvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
+            var pauseBG = pauseT.Find("Background") as RectTransform;
+            pauseBG.gameObject.SetActive(true);
+            pauseWS.TargetRectTransform = pauseBG;
+            pauseWS.EnableCollider = true;
+
+            pauseT.SetParent(holderT, false);
+            skipCanvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
+            skipCanvas.renderMode = RenderMode.WorldSpace;
+            skipCanvas.worldCamera = VRInputModule.Instance.laserCamera;
+            skipT.name = "Skip Canvas";
+            skipT.localPosition = Vector3.zero;
+            skipT.localRotation = Quaternion.identity;
+            skipT.localScale = Vector3.one;
+            var skipWS = skipCanvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
+            skipWS.EnableCollider = true;
+        });
+    }
+    #endregion
+    
 
     // ==============
     // VipMassagePlan

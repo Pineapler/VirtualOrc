@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace VirtualOrc.Scripts;
 
@@ -10,14 +9,14 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
     public Vector3 perceivedScale = Vector3.one; // Scale at 1m from the camera
 
     public BoxCollider boxCollider;
-    private bool _colliderEnabled;
+    private bool _enableCollider;
     private bool _isColliderAdded;
 
     
-    public bool colliderEnabled {
-        get => _colliderEnabled;
+    public bool EnableCollider {
+        get => _enableCollider;
         set {
-            _colliderEnabled = true;
+            _enableCollider = true;
             if (value == false) {
                 if (boxCollider == null) return;
                 boxCollider.enabled = false;
@@ -25,21 +24,21 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
             }
 
             if (boxCollider == null) {
-                if (!targetRectTransform.gameObject.TryGetComponent(out boxCollider)) {
-                    boxCollider = targetRectTransform.gameObject.AddComponent<BoxCollider>();
+                if (!TargetRectTransform.gameObject.TryGetComponent(out boxCollider)) {
+                    boxCollider = TargetRectTransform.gameObject.AddComponent<BoxCollider>();
                     _isColliderAdded = true;
                 }
                 else {
                     _isColliderAdded = false;
                 }
             }
-            boxCollider.size = targetRectTransform.sizeDelta;
+            boxCollider.size = TargetRectTransform.sizeDelta;
             boxCollider.enabled = true;
         }
     }
 
     private RectTransform _canvasRectTransform;
-    public RectTransform targetRectTransform {
+    public RectTransform TargetRectTransform {
         get {
             if (_canvasRectTransform == null) {
                 _canvasRectTransform = GetComponent<RectTransform>();
@@ -56,7 +55,7 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
             // float fac = Plugin.Config.CanvasScaleFactor;
             // _canvasRectTransform.localScale = new Vector3(fac, fac, 1);
             
-            if (colliderEnabled) {
+            if (EnableCollider) {
                 if (_isColliderAdded) {
                     Destroy(boxCollider);
                     _isColliderAdded = false;
@@ -84,7 +83,7 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
     private void Billboard() {
         if (!enableBillboard) return;
         
-        targetRectTransform.LookAt(VRRig.Instance.headsetCam.transform, Vector3.up);
+        TargetRectTransform.LookAt(VRRig.Instance.headsetCam.transform, Vector3.up);
     }
 
 
