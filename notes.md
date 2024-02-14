@@ -1,6 +1,5 @@
 ﻿# WIP
 
-- [ ] Move client dialogue UI to world space
 - [ ] Controller laser interaction (partial)
 - [ ] Move full body massage targets UI to world space
 
@@ -9,13 +8,19 @@
 ### Features
 
 - [ ] Parent orc hands to VR controllers, use these in massage games instead of laser
+- [ ] Move around the scene using VR controllers
+  - Orbit
+  - Free move?
 
 ### Bugs 
 
 - [ ] Fix LogSystemManager properly. Currently disabled the UI so that it's not cluttering the screen.
 - [ ] Replace the missing fluid sim water with a vr-friendly alternative
 - [ ] Make sure plugin behaves properly across scene reloads
+  - SteamVR actions don't like the reload for some reason
 - [ ] Patch out WaterFiller (null ref from zibra liquids)
+- [ ] Pause menu layout is slightly messed up in world space.
+  - volume sliders don't work - implement in VRInputModule
 
 ### UI
  
@@ -34,6 +39,7 @@
 - [X] World space UI elements use an overlay camera
 - [X] Move main menu canvas to world space
 - [X] Move phone UI to world space
+- [X] Move client dialogue UI to world space
 
 # Other mods?
 
@@ -46,7 +52,7 @@
   - Instead have these as unlocked costumes and let the player choose on massage begin.
   - Figure out how to get the clothes used in the built-in clothing settings
 
-## Notes
+# Notes
 
 - OrcTouchingHand.cs has cam/mouse raycast logic
 - RaycastSystem.cs
@@ -55,6 +61,3 @@
 - TrainingGame.cs is the main massage script I think
 - CubeMassageGame.cs
 - WeakPoint.cs might need patching, might be ok
-
-- Pause menu is a bit bugged but it mostly works. Should probably revisit it later.
-  - Sliders don't work

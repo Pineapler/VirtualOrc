@@ -2,6 +2,8 @@
 
 This mod is barely functional and not ready for general use.
 
+See [notes.md](notes.md) for a more up-to-date checklist of what I'm working on and what is planned.
+
 I'm not sure what the scope of this mod will be at the moment. The vanilla gameplay seems to lend itself
 to a VR control scheme very well, but I'm not sure if I will have time to fully flesh it out. At the very least there will
 be 6 degrees of freedom head movement with the original keyboard/mouse controls.
