@@ -16,7 +16,7 @@ public class InputPatch {
     // ============
     // InputManager
     // ============
-    #region
+    #region InputManager
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InputManager), "SexInput")]
     private static bool InputManager_SexInputVR(InputManager __instance) {
@@ -115,7 +115,7 @@ public class InputPatch {
     // ==================
     // MouseCursorManager
     // ==================
-    #region
+    #region MouseCursorManager
     public static PropertyInfo mcm_hitProp;
     public static PropertyInfo mcm_lastRaycastableProp;
     
@@ -177,7 +177,7 @@ public class InputPatch {
     // ===========
     // TalkManager
     // ===========
-    #region
+    #region TalkManager
     [HarmonyPrefix]
     [HarmonyPatch(typeof(TalkManager), "Update")]
     private static bool TalkManager_Update(TalkManager __instance) {

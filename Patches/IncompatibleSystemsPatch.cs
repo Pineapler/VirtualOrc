@@ -7,6 +7,7 @@ namespace VirtualOrc.Patches;
 [HarmonyPatch]
 public class IncompatibleSystemsPatch {
 
+    #region ZibraLiquid
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ZibraLiquidTool), "Awake")]
     private static bool DestroyZibraLiquids(ZibraLiquidTool __instance) {
@@ -70,4 +71,5 @@ public class IncompatibleSystemsPatch {
     private static bool BypassStopOrcLiquid() {
         return false;
     }
+    #endregion
 }

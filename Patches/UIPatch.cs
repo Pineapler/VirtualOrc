@@ -16,6 +16,7 @@ public class UIPatch {
     // ===============
     // TEMPORARY FIXES
     // ===============
+    #region TEMPORARY FIXES
     [HarmonyPostfix]
     [HarmonyPatch(typeof(LogSystemMananger), "Awake")]
     private static void LogSystemManager_DisableBrokenUI(LogSystemMananger __instance) {
@@ -23,13 +24,14 @@ public class UIPatch {
         Log.Warning("Disabling LogSystemManager::Training, as its UI is broken in VR. This may be fixed later.");
         __instance.transform.Find("Training").gameObject.SetActive(false);
     }
+    #endregion
     // ################
     
     
     // ======================
     // StartSceneUIManager.cs
     // ======================
-    
+    #region StartSceneUIManager
     [HarmonyPostfix]
     [HarmonyPatch(typeof(StartSceneUIManager), "Start")]
     private static void StartScene_ToWorldSpace(StartSceneUIManager __instance) {
@@ -54,12 +56,12 @@ public class UIPatch {
         __instance.selected.transform.DOLocalMoveY(target.localPosition.y, 0.1f).SetEase(__instance.moveEase);
         return false;
     }
-    
+    #endregion
     
     // =============
     // ChatNotify.cs
     // =============
-    
+    #region ChatNotify
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ChatNotify), "ShowUI")]
     private static void ChatNotify_MoveToWorldSpace(ChatNotify __instance) {
@@ -94,12 +96,13 @@ public class UIPatch {
         __instance.holder.position = __instance.transform.position + Vector3.up * 0.3f;
         return false;
     }
+    #endregion
     
     
     // =====================
     // InteractableHintUI.cs
     // =====================
-    
+    #region InteractableHintUI
     [HarmonyPostfix]
     [HarmonyPatch(typeof(InteractableHintUI), "Start")]
     private static void InteractableHintUI_ToWorldSpace(InteractableHintUI __instance) {
@@ -123,12 +126,13 @@ public class UIPatch {
     private static bool InteractableHintUI_BypassShowInScreenPoint() {
         return false;
     }
+    #endregion
    
     
     // ===========
     // GameManager
     // ===========
-    #region
+    #region GameManager
     [HarmonyPostfix]
     [HarmonyPatch(typeof(GameManager), "Start")]
     private static void GameManager_ToWorldSpace(GameManager __instance) {
@@ -179,7 +183,7 @@ public class UIPatch {
     // ===========
     // DialogueManager
     // ===========
-    #region
+    #region DialogueManager
     [HarmonyPostfix]
     [HarmonyPatch(typeof(DialogueManager), "Awake")]
     private static void DialogueManager_ToWorldSpace(DialogueManager __instance) {
@@ -208,7 +212,7 @@ public class UIPatch {
     // ==============
     // VipMassagePlan
     // ==============
-    #region
+    #region VipMassagePlan
     //
     //
     // [HarmonyPostfix]
