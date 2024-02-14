@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using DG.Tweening;
 using HarmonyLib;
 using Pineapler.Utils;
 using UnityEngine;
-using UnityEngine.UIElements;
 using VirtualOrc.Scripts;
 
 namespace VirtualOrc.Patches;
@@ -227,7 +227,7 @@ public class UIPatch {
             Transform pauseT = pauseCanvas.transform;
             Transform skipT = skipCanvas.transform;
 
-            skipT.SetParent(holderT, false);
+            pauseT.SetParent(holderT, false);
             pauseCanvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
             pauseCanvas.renderMode = RenderMode.WorldSpace;
             pauseCanvas.worldCamera = VRInputModule.Instance.laserCamera;
@@ -241,7 +241,7 @@ public class UIPatch {
             pauseWS.TargetRectTransform = pauseBG;
             pauseWS.EnableCollider = true;
 
-            pauseT.SetParent(holderT, false);
+            skipT.SetParent(holderT, false);
             skipCanvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
             skipCanvas.renderMode = RenderMode.WorldSpace;
             skipCanvas.worldCamera = VRInputModule.Instance.laserCamera;
@@ -260,41 +260,66 @@ public class UIPatch {
     // VipMassagePlan
     // ==============
     #region VipMassagePlan
-    //
-    //
-    // [HarmonyPostfix]
-    // [HarmonyPatch(typeof(VipMassagePlan), "Start")]
-    // private static void VipMassagePlan_ToWorldSpace(VipMassagePlan __instance) {
-    //     VRRig.OnReady(() => {
-    //         Canvas canvas = __instance.GetComponent<Canvas>();
-    //         canvas.name = "VipMassagePlan Canvas";
-    //         canvas.renderMode = RenderMode.WorldSpace;
-    //         canvas.worldCamera = VRInputModule.Instance.uiCamera;
-    //         Transform t = canvas.transform;
-    //         t.SetParent(VRRig.Instance.canvasHolder.transform, false);
-    //         t.localPosition = Vector3.zero;
-    //         t.localRotation = Quaternion.identity;
-    //         t.localScale = Vector3.one;
-    //
-    //         canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
-    //
-    //         foreach (Transform child in __instance.transform) {
-    //             var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
-    //             wsCanvasTools.colliderEnabled = true;
-    //         }
-    //     });
+    
+    
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(VipMassagePlan), "Start")]
+    private static void VipMassagePlan_ToWorldSpace(VipMassagePlan __instance) {
+        VRRig.OnReady(() => {
+            Canvas canvas = __instance.GetComponent<Canvas>();
+            canvas.name = "VipMassagePlan Canvas";
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.worldCamera = VRInputModule.Instance.laserCamera;
+            Transform t = canvas.transform;
+            t.SetParent(VRRig.Instance.canvasHolder.transform, false);
+            t.localPosition = Vector3.zero;
+            t.localRotation = Quaternion.identity;
+            t.localScale = Vector3.one;
+    
+            canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
+    
+            foreach (Transform child in __instance.transform) {
+                var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
+                wsCanvasTools.EnableCollider = true;
+            }
+        });
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(AnalyzeMassageSelection), "Setup")]
+    private static void AnalyzeMassageSelection_Setup(AnalyzeMassageSelection __instance) {
+        foreach (var button in __instance.analyzeMassageModeUIs) {
+            Transform t = button.transform;
+            t.localRotation = Quaternion.identity; 
+            t.localPosition = new Vector3(t.localPosition.x, 0, 0);
+        }
+    }
+    // [HarmonyPrefix]
+    // [HarmonyPatch(typeof(AnalyzeMassageSelection), "OnEnable")]
+    // private static bool AnalyzeMassageSelection_OnEnable(AnalyzeMassageSelection __instance) {
+    //     RectTransform t = __instance.GetComponent<RectTransform>();
+    //     t.localPosition = new Vector3(t.localPosition.x, -708f, 0);
+    //     return false;
     // }
     //
-    // [HarmonyPostfix]
-    // [HarmonyPatch(typeof(AnalyzeMassageSelection), "Setup")]
-    // private static void AnalyzeMassageSelection_FixPosition(AnalyzeMassageSelection __instance) {
-    //     foreach (var child in __instance.analyzeMassageModeUIs) {
-    //         Transform t = child.transform;
-    //         Vector3 tempPos = t.localPosition;
-    //         t.localPosition = new Vector3(tempPos.x, tempPos.y, 0);
-    //     }
+    // [HarmonyPrefix]
+    // [HarmonyPatch(typeof(AnalyzeMassageSelection), nameof(AnalyzeMassageSelection.ShowAvailableMassageModes))]
+    // private static bool AnalyzeMassageSelection_ShowAvailableMassageModes(AnalyzeMassageSelection __instance) {
+    //     RectTransform t = __instance.GetComponent<RectTransform>();
+    //     t.DOKill();
+    //     __instance.holder.SetActive(true);
+    //     t.DOLocalMoveY(-508f, 0.5f);
+    //     return false;
     // }
     //
+    // [HarmonyPrefix]
+    // [HarmonyPatch(typeof(AnalyzeMassageSelection), nameof(AnalyzeMassageSelection.HideUI))]
+    // private static bool AnalyzeMassageSelection_HideUI(AnalyzeMassageSelection __instance) {
+    //     RectTransform t = __instance.GetComponent<RectTransform>();
+    //     t.DOLocalMoveY(-708f, 0.5f).OnComplete(() => __instance.holder.SetActive(false));
+    //     return false;
+    // }
+    
     #endregion
     
 }

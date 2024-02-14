@@ -1,5 +1,6 @@
 ﻿# WIP
 
+- [ ] Move client dialogue UI to world space
 - [ ] Controller laser interaction (partial)
 - [ ] Move full body massage targets UI to world space
 
@@ -18,14 +19,12 @@
 
 ### UI
  
-- [ ] Move phone UI to world space
 - [ ] Move computer UI to world space
-- [ ] Move client dialogue UI to world space
 
 ### Unity/BepInEx/Asset specific
+
 - [ ] Hook the SteamVR recentre event and apply our own `VrRig().Recentre`. Also do Y rotation.
 - [ ] Automatically copy SteamVR StreamingAssets to game directory
-
 
 # Complete
 
@@ -34,6 +33,7 @@
 - [X] Patch out features that would crash VR (Zibra Liquid)
 - [X] World space UI elements use an overlay camera
 - [X] Move main menu canvas to world space
+- [X] Move phone UI to world space
 
 # Other mods?
 
