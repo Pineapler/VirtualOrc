@@ -171,7 +171,22 @@ public class InputPatch {
 
         return false;
     }
-    
     #endregion
     
+    
+    // ===========
+    // TalkManager
+    // ===========
+    #region
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TalkManager), "Update")]
+    private static bool TalkManager_Update(TalkManager __instance) {
+        if (VRInputModule.Instance == null || !VRInputModule.Instance.isLaserActive) return true;
+
+        if (__instance.talkWindow.gameObject.activeInHierarchy && Input.InteractLaserPressed()) {
+            __instance.StartCoroutine("NextEvent");
+        }
+        return false;
+    }
+    #endregion
 }

@@ -125,7 +125,7 @@ public class VRRig : MonoBehaviour {
         canvasHolder.layer = LayerMask.NameToLayer("UI");
         canvasHolder.transform.SetParent(cineObj.transform, false);
         canvasHolder.transform.localPosition = new Vector3(0, 0, Plugin.Config.CanvasDistance.Value);
-        canvasHolder.transform.localScale = new Vector3(Plugin.Config.CanvasScaleFactor, Plugin.Config.CanvasScaleFactor, 1);
+        canvasHolder.transform.localScale = new Vector3(Plugin.Config.CanvasScaleFactor, Plugin.Config.CanvasScaleFactor, Plugin.Config.CanvasScaleFactor);
     }
 
     private void SeparateCinemachineBrain() {

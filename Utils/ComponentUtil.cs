@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Pineapler.Utils;
 
-public class ComponentUtil {
+public static class ComponentUtil {
     public static T CopyComponent<T>(T original, GameObject destination) where T : Component {
         // from https://discussions.unity.com/t/copy-a-component-at-runtime/71172/3 
         Type type = typeof(T);
@@ -21,5 +21,11 @@ public class ComponentUtil {
         }
 
         return dstComponent;
+    }
+
+    public static void SetLayerRecursive(this GameObject obj, int layer) {
+        foreach (Transform t in obj.GetComponentsInChildren<Transform>(true)) {
+            t.gameObject.layer = layer;
+        }
     }
 }

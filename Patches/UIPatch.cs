@@ -2,6 +2,7 @@
 using HarmonyLib;
 using Pineapler.Utils;
 using UnityEngine;
+using UnityEngine.UIElements;
 using VirtualOrc.Scripts;
 
 namespace VirtualOrc.Patches;
@@ -62,18 +63,25 @@ public class UIPatch {
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ChatNotify), "ShowUI")]
     private static void ChatNotify_MoveToWorldSpace(ChatNotify __instance) {
-        __instance.transform.localScale = Vector3.one;
+        Transform t = __instance.transform;
+        t.localRotation = Quaternion.identity;
+        t.localScale = Vector3.one;
+        
         __instance.holder.localPosition = Vector3.zero;
+        __instance.holder.localRotation = Quaternion.identity;
+        __instance.holder.localScale = Vector3.one;
 
         __instance.canvas.gameObject.layer = LayerMask.NameToLayer("UI");
         __instance.canvas.renderMode = RenderMode.WorldSpace;
+        
         Transform canvasTransform = __instance.canvas.transform;
-        canvasTransform.localScale = Vector3.one;
-        // * scale and rotation is handled by a method patch
+        canvasTransform.localPosition = Vector3.zero;
+        canvasTransform.localRotation = Quaternion.identity;
+        canvasTransform.localScale = new Vector3(0.005f, 0.005f, 0.005f);
         
         var wsCanvasTools = __instance.canvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
-        wsCanvasTools.canvasRectTransform.localScale = new Vector3(0.005f, 0.005f, 0.005f);
-        wsCanvasTools.canvasRectTransform.localPosition = Vector3.zero;
+        // wsCanvasTools.targetRectTransform = __instance.holder.GetComponent<RectTransform>();
+        wsCanvasTools.targetRectTransform = __instance.canvas.GetComponent<RectTransform>();
         wsCanvasTools.enableBillboard = true;
         // wsCanvasTools.enablePerspectiveScale = true;
         // wsCanvasTools.perceivedScale = new Vector3(0.005f, 0.005f, 1);
@@ -103,7 +111,7 @@ public class UIPatch {
         canvasTransform.localPosition = Vector3.zero;
         canvasTransform.localScale = new Vector3(0.005f, 0.005f, 0.005f);
         var wsCanvasTools = __instance.gameObject.AddComponent<WorldSpaceCanvasTools>();
-        wsCanvasTools.canvasRectTransform = __instance.hintPoint.GetComponent<RectTransform>();
+        wsCanvasTools.targetRectTransform = __instance.hintPoint.GetComponent<RectTransform>();
         wsCanvasTools.enableBillboard = true;
         // wsCanvasTools.enablePerspectiveScale = true;
         // wsCanvasTools.perceivedScale = new Vector3(0.005f, 0.005f, 1);
@@ -115,4 +123,127 @@ public class UIPatch {
     private static bool InteractableHintUI_BypassShowInScreenPoint() {
         return false;
     }
+   
+    
+    // ===========
+    // GameManager
+    // ===========
+    #region
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(GameManager), "Start")]
+    private static void GameManager_ToWorldSpace(GameManager __instance) {
+        VRRig.OnReady(() => {
+            Canvas canvas = UIManager.Instance.PhoneWindow.transform.parent.GetComponentInChildren<Canvas>(); // jesus christ
+            canvas.name = "GameManager Canvas";
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.worldCamera = VRInputModule.Instance.uiCamera;
+            Transform t = canvas.transform;
+            t.SetParent(VRRig.Instance.canvasHolder.transform, false);
+            t.localPosition = Vector3.zero;
+            t.localRotation = Quaternion.identity;
+            t.localScale = Vector3.one;
+            
+            canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
+
+            foreach (Transform child in canvas.transform) {
+                var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
+                wsCanvasTools.colliderEnabled = true;
+            }
+        });
+    }
+    
+    
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(GameManager), "Start")]
+    private static void GameManager_ToWorldSpace_TalkCanvas(GameManager __instance) {
+        VRRig.OnReady(() => {
+            Canvas canvas = __instance.GetComponent<TalkManager>().talkWindow.transform.parent.GetComponent<Canvas>(); // jesus christ
+            canvas.name = "TalkWindow Canvas";
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.worldCamera = VRInputModule.Instance.uiCamera;
+            Transform t = canvas.transform;
+            t.SetParent(VRRig.Instance.canvasHolder.transform, false);
+            t.localPosition = Vector3.zero;
+            t.localRotation = Quaternion.identity;
+            t.localScale = Vector3.one;
+            
+            canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
+
+            // var wsCanvasTools = canvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
+            // wsCanvasTools.colliderEnabled = true;
+        });
+    }
+    #endregion
+    
+    
+    // ===========
+    // DialogueManager
+    // ===========
+    #region
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(DialogueManager), "Awake")]
+    private static void DialogueManager_ToWorldSpace(DialogueManager __instance) {
+        VRRig.OnReady(() => {
+            Canvas canvas = __instance.GetComponent<Canvas>();
+            canvas.name = "DialogueManager Canvas";
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.worldCamera = VRInputModule.Instance.uiCamera;
+            Transform t = canvas.transform;
+            t.SetParent(VRRig.Instance.canvasHolder.transform, false);
+            t.localPosition = Vector3.zero;
+            t.localRotation = Quaternion.identity;
+            t.localScale = Vector3.one;
+
+            canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
+            
+            // foreach (Transform child in __instance.dialogueSelection) {
+            //     var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
+            //     wsCanvasTools.colliderEnabled = true;
+            // }
+        });
+    }
+    #endregion
+
+
+    // ==============
+    // VipMassagePlan
+    // ==============
+    #region
+    //
+    //
+    // [HarmonyPostfix]
+    // [HarmonyPatch(typeof(VipMassagePlan), "Start")]
+    // private static void VipMassagePlan_ToWorldSpace(VipMassagePlan __instance) {
+    //     VRRig.OnReady(() => {
+    //         Canvas canvas = __instance.GetComponent<Canvas>();
+    //         canvas.name = "VipMassagePlan Canvas";
+    //         canvas.renderMode = RenderMode.WorldSpace;
+    //         canvas.worldCamera = VRInputModule.Instance.uiCamera;
+    //         Transform t = canvas.transform;
+    //         t.SetParent(VRRig.Instance.canvasHolder.transform, false);
+    //         t.localPosition = Vector3.zero;
+    //         t.localRotation = Quaternion.identity;
+    //         t.localScale = Vector3.one;
+    //
+    //         canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
+    //
+    //         foreach (Transform child in __instance.transform) {
+    //             var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
+    //             wsCanvasTools.colliderEnabled = true;
+    //         }
+    //     });
+    // }
+    //
+    // [HarmonyPostfix]
+    // [HarmonyPatch(typeof(AnalyzeMassageSelection), "Setup")]
+    // private static void AnalyzeMassageSelection_FixPosition(AnalyzeMassageSelection __instance) {
+    //     foreach (var child in __instance.analyzeMassageModeUIs) {
+    //         Transform t = child.transform;
+    //         Vector3 tempPos = t.localPosition;
+    //         t.localPosition = new Vector3(tempPos.x, tempPos.y, 0);
+    //     }
+    // }
+    //
+    #endregion
+    
 }

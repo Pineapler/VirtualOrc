@@ -25,21 +25,21 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
             }
 
             if (boxCollider == null) {
-                if (!canvasRectTransform.gameObject.TryGetComponent(out boxCollider)) {
-                    boxCollider = canvasRectTransform.gameObject.AddComponent<BoxCollider>();
+                if (!targetRectTransform.gameObject.TryGetComponent(out boxCollider)) {
+                    boxCollider = targetRectTransform.gameObject.AddComponent<BoxCollider>();
                     _isColliderAdded = true;
                 }
                 else {
                     _isColliderAdded = false;
                 }
             }
-            boxCollider.size = canvasRectTransform.sizeDelta;
+            boxCollider.size = targetRectTransform.sizeDelta;
             boxCollider.enabled = true;
         }
     }
 
     private RectTransform _canvasRectTransform;
-    public RectTransform canvasRectTransform {
+    public RectTransform targetRectTransform {
         get {
             if (_canvasRectTransform == null) {
                 _canvasRectTransform = GetComponent<RectTransform>();
@@ -84,7 +84,7 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
     private void Billboard() {
         if (!enableBillboard) return;
         
-        canvasRectTransform.rotation = Quaternion.LookRotation(VRRig.Instance.headsetObj.transform.position - canvasRectTransform.position, Vector3.up);
+        targetRectTransform.LookAt(VRRig.Instance.headsetCam.transform, Vector3.up);
     }
 
 
