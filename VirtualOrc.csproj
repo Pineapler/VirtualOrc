@@ -31,26 +31,32 @@
   
   
   <ItemGroup>
+    
+<!-- GAME ASSEMBLY -->
     <Reference Include="Assembly-CSharp">
       <HintPath>Libs\Assembly-CSharp.dll</HintPath>
     </Reference>
+    
+<!-- VR ASSEMBLIES -->
     <Reference Include="Unity.XR.Management">
-      <HintPath>Libs\Unity.XR.Management.dll</HintPath>
+      <HintPath>Libs\RuntimeDeps\Unity.XR.Management.dll</HintPath>
     </Reference>
     <Reference Include="Unity.XR.OpenVR">
-      <HintPath>Libs\Unity.XR.OpenVR.dll</HintPath>
+      <HintPath>Libs\RuntimeDeps\Unity.XR.OpenVR.dll</HintPath>
     </Reference>
     <Reference Include="Valve.VR">
-      <HintPath>Libs\SteamVR.dll</HintPath>
+      <HintPath>Libs\RuntimeDeps\SteamVR.dll</HintPath>
     </Reference>
     <Reference Include="Valve.VR">
-      <HintPath>Libs\SteamVR_Actions.dll</HintPath>
-    </Reference>
-    <Reference Include="Cinemachine">
-      <HintPath>Libs\Cinemachine.dll</HintPath>
+      <HintPath>Libs\RuntimeDeps\SteamVR_Actions.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.SpatialTracking">
-      <HintPath>Libs\UnityEngine.SpatialTracking.dll</HintPath>
+      <HintPath>Libs\RuntimeDeps\UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
+    
+<!-- required for patching -->
+    <Reference Include="Cinemachine">
+      <HintPath>Libs\Cinemachine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Libs\UnityEngine.UI.dll</HintPath>
@@ -66,10 +72,5 @@
   
   <ItemGroup>
     <Folder Include="StreamingAssets\SteamVR\" />
-  </ItemGroup>
-  
-  
-  <ItemGroup>
-    <Content Include="Libs\Assembly-CSharp.dll" />
   </ItemGroup>
 </Project>

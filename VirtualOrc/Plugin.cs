@@ -31,8 +31,10 @@ public class Plugin : BaseUnityPlugin {
             return;
         }
 
-        ok = LibraryLoader.SetupRuntimeAssets();
-        if (!ok) {
+        bool ok1 = LibraryLoader.SetupPlugins();
+        bool ok2 = LibraryLoader.SetupSubsystems();
+        bool ok3 = LibraryLoader.SetupStreamingAssets();
+        if (!ok1 || !ok2 || !ok3) {
             Log.Error("Restart the game for VR to work!");
             return;
         }

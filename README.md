@@ -17,23 +17,35 @@ A VR mod for the game ["Orc Massage" by Torch Studio](https://store.steampowered
 
 Install BepInEx and run the game at least once to generate the mod folders.
 
-# Building and installing plugin (OUTDATED - I'll update this once I know exactly which libraries are needed)
+# Building and manually packaging plugin
+
+## Build the plugin
 
 - Copy `<game>/OrcMassage_Data/Managed/Assembly-CSharp.dll` to `Libs`
 - Build
-- Copy VirtualOrc.dll from the output directory into `<game>/BepInEx/plugins`
-- Make a new directory `<game>/BepInEx/plugins/RuntimeDeps`
-- Copy the following files from Libs into RuntimeDeps:
-    - `openxr_loader.dll`
-    - `Unity.InputSystem.dll`
-    - `Unity.XR.Management.dll`
-    - `Unity.XR.OpenXR.dll`
-    - `UnityEngine.SpatialTracking.dll`
-    - `UnityOpenXR.dll`
+
+## Package the plugin
+
+- Create a directory `<pkg_dir>` to store the packaged plugin, e.g. "VirtualOrc".
+- Copy `VirtualOrc.dll` from the build output directory into the package directory.
+- Copy `<src_dir>/Libs/RuntimeDeps` into `<pkg_dir>/RuntimeDeps`
+- Copy the directory `<src_dir>/StreamingAssets` into `<pkg_dir>/RuntimeDeps/StreamingAssets`
+
+The packaged plugin should look like the following
+```
+v VirtualOrc
+    v RuntimeDeps
+        > Plugins
+        > StreamingAssets
+        ...
+    VirtualOrc.dll
+```
+
+- Place the packaged plugin directory in `<game>/BepInEx/plugins`
 - Launch the game and wait for it to load. This first run will set up the game to work with VR.
 - Close the game and relaunch it.
 
-## Build configurations
+## Updating the plugin
 
 After following these instructions once, the mod can be updated by overwriting only the `VirtualOrc.dll` file.
 

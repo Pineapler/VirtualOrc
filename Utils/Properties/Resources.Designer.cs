@@ -80,9 +80,33 @@ namespace Pineapler.Utils.Properties {
         ///}
         ///.
         /// </summary>
-        internal static string UnitySubsystemsManifest {
+        internal static string OpenVR_UnitySubsystemsManifest {
             get {
-                return ResourceManager.GetString("UnitySubsystemsManifest", resourceCulture);
+                return ResourceManager.GetString("OpenVR_UnitySubsystemsManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///        &quot;name&quot;: &quot;OpenXR XR Plugin&quot;,
+        ///        &quot;version&quot;: &quot;1.2.8&quot;,
+        ///        &quot;libraryName&quot;: &quot;UnityOpenXR&quot;,
+        ///        &quot;displays&quot;: [
+        ///                {
+        ///                        &quot;id&quot;: &quot;OpenXR Display&quot;
+        ///                }
+        ///        ],
+        ///        &quot;inputs&quot;: [
+        ///                {
+        ///                        &quot;id&quot;: &quot;OpenXR Input&quot;
+        ///                }
+        ///        ]
+        ///}
+        ///.
+        /// </summary>
+        internal static string OpenXR_UnitySubsystemsManifest {
+            get {
+                return ResourceManager.GetString("OpenXR_UnitySubsystemsManifest", resourceCulture);
             }
         }
     }
