@@ -5,8 +5,8 @@ namespace VirtualOrc.Scripts;
 public class WorldSpaceCanvasTools : MonoBehaviour {
 
     public bool enableBillboard;
-    public bool enablePerspectiveScale;
-    public Vector3 perceivedScale = Vector3.one; // Scale at 1m from the camera
+    // public bool enablePerspectiveScale;
+    // public Vector3 perceivedScale = Vector3.one; // Scale at 1m from the camera
 
     public BoxCollider boxCollider;
     private bool _enableCollider;
@@ -76,7 +76,7 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
     private void LateUpdate() {
         if (VRRig.Instance == null) return;
         Billboard();
-        PerspectiveScale();
+        // PerspectiveScale();
     }
 
 
@@ -87,22 +87,22 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
     }
 
 
-    private void PerspectiveScale() {
-        if (!enablePerspectiveScale || VRRig.Instance == null) return;
-
-        // Get distance from camera
-        // Compare 1u from camera
-
-        // S_p is scale at distance from camera @ 1u (perceived size)
-        // s_a is scale required to match the perceived size, when the object is n units from camera
-
-        // d : s
-        // 3        :   required_scale
-        // 1        :   (2, 2, 2)
-
-        Transform t = transform;
-        float dist = (t.position - VRRig.Instance.headsetCam.transform.position).magnitude;
-        t.localScale = dist * perceivedScale;
-    }
+    // private void PerspectiveScale() {
+    //     if (!enablePerspectiveScale || VRRig.Instance == null) return;
+    //
+    //     // Get distance from camera
+    //     // Compare 1u from camera
+    //
+    //     // S_p is scale at distance from camera @ 1u (perceived size)
+    //     // s_a is scale required to match the perceived size, when the object is n units from camera
+    //
+    //     // d : s
+    //     // 3        :   required_scale
+    //     // 1        :   (2, 2, 2)
+    //
+    //     Transform t = transform;
+    //     float dist = (t.position - VRRig.Instance.headsetCam.transform.position).magnitude;
+    //     t.localScale = dist * perceivedScale;
+    // }
 
 }

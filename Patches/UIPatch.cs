@@ -17,7 +17,9 @@ public class UIPatch {
     // ===============
     // TEMPORARY FIXES
     // ===============
+
     #region TEMPORARY FIXES
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(LogSystemMananger), "Awake")]
     private static void LogSystemManager_DisableBrokenUI(LogSystemMananger __instance) {
@@ -25,14 +27,18 @@ public class UIPatch {
         Log.Warning("Disabling LogSystemManager::Training, as its UI is broken in VR. This may be fixed later.");
         __instance.transform.Find("Training").gameObject.SetActive(false);
     }
+
     #endregion
+
     // ################
-    
-    
+
+
     // ======================
     // StartSceneUIManager.cs
     // ======================
+
     #region StartSceneUIManager
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(StartSceneUIManager), "Start")]
     private static void StartScene_ToWorldSpace(StartSceneUIManager __instance) {
@@ -44,11 +50,11 @@ public class UIPatch {
             Transform t = canvas.transform;
             t.SetParent(VRRig.Instance.canvasHolder.transform, false);
             t.localPosition = Vector3.zero;
-            
+
             var wsCanvasTools = canvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
             wsCanvasTools.EnableCollider = true;
         });
-        
+
     }
 
     [HarmonyPrefix]
@@ -57,31 +63,34 @@ public class UIPatch {
         __instance.selected.transform.DOLocalMoveY(target.localPosition.y, 0.1f).SetEase(__instance.moveEase);
         return false;
     }
+
     #endregion
-    
+
     // =============
     // ChatNotify.cs
     // =============
+
     #region ChatNotify
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ChatNotify), "ShowUI")]
     private static void ChatNotify_MoveToWorldSpace(ChatNotify __instance) {
         Transform t = __instance.transform;
         t.localRotation = Quaternion.identity;
         t.localScale = Vector3.one;
-        
+
         __instance.holder.localPosition = Vector3.zero;
         __instance.holder.localRotation = Quaternion.identity;
         __instance.holder.localScale = Vector3.one;
 
         __instance.canvas.gameObject.layer = LayerMask.NameToLayer("UI");
         __instance.canvas.renderMode = RenderMode.WorldSpace;
-        
+
         Transform canvasTransform = __instance.canvas.transform;
         canvasTransform.localPosition = Vector3.zero;
         canvasTransform.localRotation = Quaternion.identity;
         canvasTransform.localScale = new Vector3(0.005f, 0.005f, 0.005f);
-        
+
         var wsCanvasTools = __instance.canvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
         // wsCanvasTools.targetRectTransform = __instance.holder.GetComponent<RectTransform>();
         wsCanvasTools.TargetRectTransform = __instance.canvas.GetComponent<RectTransform>();
@@ -89,25 +98,28 @@ public class UIPatch {
         // wsCanvasTools.enablePerspectiveScale = true;
         // wsCanvasTools.perceivedScale = new Vector3(0.005f, 0.005f, 1);
     }
-    
-    
+
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ChatNotify), "FloatOnHead")]
     private static bool ChatNotify_FloatOnHead(ChatNotify __instance) {
         __instance.holder.position = __instance.transform.position + Vector3.up * 0.3f;
         return false;
     }
+
     #endregion
-    
-    
+
+
     // =====================
     // InteractableHintUI.cs
     // =====================
+
     #region InteractableHintUI
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(InteractableHintUI), "Start")]
     private static void InteractableHintUI_ToWorldSpace(InteractableHintUI __instance) {
-            
+
         Canvas canvas = __instance.GetComponentInChildren<Canvas>(true);
         canvas.gameObject.layer = LayerMask.NameToLayer("UI");
         canvas.renderMode = RenderMode.WorldSpace;
@@ -127,18 +139,22 @@ public class UIPatch {
     private static bool InteractableHintUI_BypassShowInScreenPoint() {
         return false;
     }
+
     #endregion
-   
-    
+
+
     // ===========
     // GameManager
     // ===========
+
     #region GameManager
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(GameManager), "Start")]
     private static void GameManager_ToWorldSpace(GameManager __instance) {
         VRRig.OnReady(() => {
-            Canvas canvas = UIManager.Instance.PhoneWindow.transform.parent.GetComponentInChildren<Canvas>(); // jesus christ
+            Canvas canvas =
+                UIManager.Instance.PhoneWindow.transform.parent.GetComponentInChildren<Canvas>(); // jesus christ
             canvas.name = "GameManager Canvas";
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.worldCamera = VRInputModule.Instance.laserCamera;
@@ -147,7 +163,7 @@ public class UIPatch {
             t.localPosition = Vector3.zero;
             t.localRotation = Quaternion.identity;
             t.localScale = Vector3.one;
-            
+
             canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
 
             foreach (Transform child in canvas.transform) {
@@ -156,13 +172,14 @@ public class UIPatch {
             }
         });
     }
-    
-    
+
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(GameManager), "Start")]
     private static void GameManager_ToWorldSpace_TalkCanvas(GameManager __instance) {
         VRRig.OnReady(() => {
-            Canvas canvas = __instance.GetComponent<TalkManager>().talkWindow.transform.parent.GetComponent<Canvas>(); // jesus christ
+            Canvas canvas = __instance.GetComponent<TalkManager>().talkWindow.transform.parent
+                .GetComponent<Canvas>(); // jesus christ
             canvas.name = "TalkWindow Canvas";
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.worldCamera = VRInputModule.Instance.laserCamera;
@@ -171,20 +188,23 @@ public class UIPatch {
             t.localPosition = Vector3.zero;
             t.localRotation = Quaternion.identity;
             t.localScale = Vector3.one;
-            
+
             canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
 
             // var wsCanvasTools = canvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
             // wsCanvasTools.colliderEnabled = true;
         });
     }
+
     #endregion
-    
-    
+
+
     // ===========
     // DialogueManager
     // ===========
+
     #region DialogueManager
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(DialogueManager), "Awake")]
     private static void DialogueManager_ToWorldSpace(DialogueManager __instance) {
@@ -200,25 +220,27 @@ public class UIPatch {
             t.localScale = Vector3.one;
 
             canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
-            
+
             // foreach (Transform child in __instance.dialogueSelection) {
             //     var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
             //     wsCanvasTools.colliderEnabled = true;
             // }
         });
     }
+
     #endregion
 
     // ==========
     // OptionMenu
     // ==========
+
     #region OptionMenu
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(OptionMenu), "Start")]
     private static void OptionMenu_ToWorldSpace(OptionMenu __instance) {
         FieldInfo canvasField = typeof(OptionMenu).GetField("canvas", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        
+
         VRRig.OnReady(() => {
             Canvas pauseCanvas = (canvasField.GetValue(__instance) as Canvas)!;
             Canvas skipCanvas = __instance.skipManga.GetComponent<Canvas>();
@@ -253,15 +275,17 @@ public class UIPatch {
             skipWS.EnableCollider = true;
         });
     }
+
     #endregion
-    
+
 
     // ==============
     // VipMassagePlan
     // ==============
+
     #region VipMassagePlan
-    
-    
+
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(VipMassagePlan), "Start")]
     private static void VipMassagePlan_ToWorldSpace(VipMassagePlan __instance) {
@@ -275,9 +299,9 @@ public class UIPatch {
             t.localPosition = Vector3.zero;
             t.localRotation = Quaternion.identity;
             t.localScale = Vector3.one;
-    
+
             canvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
-    
+
             foreach (Transform child in __instance.transform) {
                 var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
                 wsCanvasTools.EnableCollider = true;
@@ -290,36 +314,49 @@ public class UIPatch {
     private static void AnalyzeMassageSelection_Setup(AnalyzeMassageSelection __instance) {
         foreach (var button in __instance.analyzeMassageModeUIs) {
             Transform t = button.transform;
-            t.localRotation = Quaternion.identity; 
+            t.localRotation = Quaternion.identity;
             t.localPosition = new Vector3(t.localPosition.x, 0, 0);
         }
     }
-    // [HarmonyPrefix]
-    // [HarmonyPatch(typeof(AnalyzeMassageSelection), "OnEnable")]
-    // private static bool AnalyzeMassageSelection_OnEnable(AnalyzeMassageSelection __instance) {
-    //     RectTransform t = __instance.GetComponent<RectTransform>();
-    //     t.localPosition = new Vector3(t.localPosition.x, -708f, 0);
-    //     return false;
-    // }
-    //
-    // [HarmonyPrefix]
-    // [HarmonyPatch(typeof(AnalyzeMassageSelection), nameof(AnalyzeMassageSelection.ShowAvailableMassageModes))]
-    // private static bool AnalyzeMassageSelection_ShowAvailableMassageModes(AnalyzeMassageSelection __instance) {
-    //     RectTransform t = __instance.GetComponent<RectTransform>();
-    //     t.DOKill();
-    //     __instance.holder.SetActive(true);
-    //     t.DOLocalMoveY(-508f, 0.5f);
-    //     return false;
-    // }
-    //
-    // [HarmonyPrefix]
-    // [HarmonyPatch(typeof(AnalyzeMassageSelection), nameof(AnalyzeMassageSelection.HideUI))]
-    // private static bool AnalyzeMassageSelection_HideUI(AnalyzeMassageSelection __instance) {
-    //     RectTransform t = __instance.GetComponent<RectTransform>();
-    //     t.DOLocalMoveY(-708f, 0.5f).OnComplete(() => __instance.holder.SetActive(false));
-    //     return false;
-    // }
-    
+
     #endregion
-    
+
+
+    // =================
+    // Massage floating UI
+    // =================
+
+    #region Massage Floating UI
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(FloatingUIHolder), "Awake")]
+    private static void FloatingUIHolder_ToWorldSpace(FloatingUIHolder __instance) {
+        VRRig.OnReady(() => {
+            Canvas canvas = __instance.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.WorldSpace;
+            canvas.worldCamera = VRInputModule.Instance.laserCamera;
+            canvas.transform.position = Vector3.zero;
+
+            __instance.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
+        });
+    }
+
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(MassageFloatingUIImage), "Awake")]
+    private static void MassageFloatingUIImage_AddBillboard(MassageFloatingUIImage __instance) {
+        var ws = __instance.gameObject.AddComponent<WorldSpaceCanvasTools>();
+        ws.enableBillboard = true;
+    }
+
+
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ScreenSpaceFollower), "SetPosition")]
+    private static bool ScreenSpaceFollower_WorldSpacePatch(MassageFloatingUI __instance) {
+        __instance.transform.localPosition = Vector3.zero;
+        return false;
+    }
+
+    #endregion
 }

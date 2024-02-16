@@ -16,7 +16,7 @@
 
 - [ ] Fix LogSystemManager properly. Currently disabled the UI so that it's not cluttering the screen.
 - [ ] Replace the missing fluid sim water with a vr-friendly alternative
-- [ ] Make sure plugin behaves properly across scene reloads
+- [ ] "Return to menu" breaks user input
   - SteamVR actions don't like the reload for some reason
 - [ ] Patch out WaterFiller (null ref from zibra liquids)
 - [ ] Pause menu layout is slightly messed up in world space.
