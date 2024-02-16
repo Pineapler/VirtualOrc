@@ -21,8 +21,8 @@ Install BepInEx and run the game at least once to generate the mod folders.
 
 ## Build the plugin
 
-- Copy `<game>/OrcMassage_Data/Managed/Assembly-CSharp.dll` to `Libs`
-- Build
+- Copy `<game>/OrcMassage_Data/Managed/Assembly-CSharp.dll` to `Libs`. This is code from the game and won't be shared publicly.
+- run `dotnet build`
 
 ## Package the plugin
 
