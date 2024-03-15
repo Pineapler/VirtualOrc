@@ -189,4 +189,46 @@ public class InputPatch {
         return false;
     }
     #endregion
+    
+    
+    // ===============
+    // OrcTouchingHand
+    // ===============
+    #region OrcTouchingHand
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OrcTouchingHand), "Start")]
+    private static void OrcTouchingHand_FollowController(OrcTouchingHand __instance) {
+        // VRRig.OnReady(() => {
+        //     __instance.orcHand.SetParent(VRRig.Instance.rigOffset, false);
+        //     __instance.orcHand.localPosition = Vector3.zero;
+        //     __instance.orcHand.localRotation = Quaternion.identity;
+        // });
+    }
+    
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(OrcTouchingHand), "CheckMouse_New")]
+    private static bool OrcTouchingHand_CheckMouse_New(OrcTouchingHand __instance) {
+        return true;
+        
+        // if (!Plugin.Config.vrInputEnabled) {
+        //     return true; // use default implementation
+        // }
+        //
+        // // TODO: need to know which controller the hand is attached to
+        // bool isGrabbing = Input.interact.state;
+        //
+        // return false;
+    }
+
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(OrcTouchingHand), "OrchHandPuppetMasterUpdate")]
+    private static bool OrcTouchingHand_PuppetMasterUpdate(OrcTouchingHand __instance) {
+        Transform controller = VRRig.Instance.rightController.transform;
+        __instance.PointTarget.position = controller.position;
+        __instance.PointTarget.rotation = controller.rotation;
+        return true;
+    }
+    #endregion
 }

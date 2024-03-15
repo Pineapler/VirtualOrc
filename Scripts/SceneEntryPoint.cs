@@ -80,11 +80,11 @@ public class SceneEntryPoint : MonoBehaviour {
     // =========================================================================
     
     public void OnToggleUI(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource) {
-        VRInputModule.Instance.isLaserActive = !VRInputModule.Instance.isLaserActive;
-        Log.Info($"VR UI input: {VRInputModule.Instance.isLaserActive}");
+        Plugin.Config.vrInputEnabled = !Plugin.Config.vrInputEnabled;
+        Log.Info($"VR UI input: {Plugin.Config.vrInputEnabled}");
         
-        VRInputModule.Instance.enabled = VRInputModule.Instance.isLaserActive;
-        oldInputModule.enabled = !VRInputModule.Instance.isLaserActive;
+        VRInputModule.Instance.enabled = Plugin.Config.vrInputEnabled;
+        oldInputModule.enabled = !Plugin.Config.vrInputEnabled;
     }
 
 

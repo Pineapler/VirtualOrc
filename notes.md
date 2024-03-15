@@ -1,5 +1,6 @@
 ﻿# WIP
 
+- [ ] Parent orc hands to VR controllers, use these in massage games instead of laser
 - [ ] Controller laser interaction (partial)
 - [ ] Move full body massage targets UI to world space
 
@@ -7,10 +8,10 @@
 
 ### Features
 
-- [ ] Parent orc hands to VR controllers, use these in massage games instead of laser
 - [ ] Move around the scene using VR controllers
   - Orbit
   - Free move?
+- [ ] Add an effect to hide the outside world while indoors
 
 ### Bugs 
 
@@ -21,10 +22,14 @@
 - [ ] Patch out WaterFiller (null ref from zibra liquids)
 - [ ] Pause menu layout is slightly messed up in world space.
   - volume sliders don't work - implement in VRInputModule
+- [ ] Selection rectangle on world space UI should lerp locally
+  - Phone UI
 
 ### UI
  
 - [ ] Move computer UI to world space
+- [ ] Add fade effect to full camera
+- [ ] Configure laser context stack pushes/pops (when is a laser pointer needed?)
 
 ### Unity/BepInEx/Asset specific
 
@@ -41,17 +46,6 @@
 - [X] Move phone UI to world space
 - [X] Move client dialogue UI to world space
 
-# Other mods?
-
-- [ ] SkipCutscenes
-  - Intro skip already implemented as part of this mod, could be migrated
-  - Add option to auto skip "perfect" cutscene
-  - Add option to auto skip story cutscenes? idk, I like these but some people might want the option.
-- [ ] SetGirlCostume 
-  - Currently costume is set in `VipMassageGameSystem.CheckCostume()` based on heart level.
-  - Instead have these as unlocked costumes and let the player choose on massage begin.
-  - Figure out how to get the clothes used in the built-in clothing settings
-
 # Notes
 
 - OrcTouchingHand.cs has cam/mouse raycast logic
@@ -61,3 +55,6 @@
 - TrainingGame.cs is the main massage script I think
 - CubeMassageGame.cs
 - WeakPoint.cs might need patching, might be ok
+
+
+- OrcTouchingHand

@@ -1,6 +1,4 @@
-﻿using System;
-using Pineapler.Utils;
-using System.IO;
+﻿using Pineapler.Utils;
 using System.Reflection;
 using BepInEx;
 using HarmonyLib;
@@ -22,6 +20,12 @@ public class Plugin : BaseUnityPlugin {
         Config = new Config(base.Config);
         
         Log.SetSource(Logger);
+
+        if (!Config.EnablePlugin.Value) {
+            Log.Warning("VirtualOrc is disabled.");
+            return;
+        }
+        
         Log.Info($"Plugin {PluginGuid} is starting");
 
         bool ok;
