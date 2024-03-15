@@ -16,13 +16,12 @@ A VR mod for the game ["Orc Massage" by Torch Studio](https://store.steampowered
 # Prerequisites
 
 - Install BepInEx and run the game at least once to generate the mod folders.
-- Add an environment variable "ORC_MASSAGE_DIR" which points to your game installation directory.
+- Add an environment variable `ORC_MASSAGE_DIR` which points to your game installation directory.
+- You will need to provide your own copy of `Assembly-CSharp.dll` from the game's files.
+    1. Locate the DLL: `ORC_MASSAGE_DIR/OrcMassage_Data/Managed/Assembly-CSharp.dll`
+    2. Copy it to `VirtualOrc/Libs/`
 
 # Build and install
-
-You will need to provide your own copy of `Assembly-CSharp.dll` from the game's files. 
-1. Locate the DLL: `ORC_MASSAGE_DIR/OrcMassage_Data/Managed/Assembly-CSharp.dll`
-2. Copy it to `VirtualOrc/Libs/`
 
 If you are using Jetbrains Rider, there is a run configuration called "Package and run".
 This will build the mod, create the package structure, and copy it to your game's BepInEx plugins folder.
