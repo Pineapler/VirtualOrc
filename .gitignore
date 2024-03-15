@@ -1,5 +1,7 @@
 ﻿bin/
 obj/
 
+*.user
+
 # Non-free, user provided
 Libs/**/Assembly-CSharp.dll 
