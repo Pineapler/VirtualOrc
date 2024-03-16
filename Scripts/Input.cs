@@ -19,6 +19,15 @@ public static class Input {
         toggleUI = SteamVR_Actions.default_ToggleUI;
         pause = SteamVR_Actions.default_Pause;
     }
+
+    public static void UnsubscribeAllListeners() {
+        interact.RemoveAllListeners(SteamVR_Input_Sources.Any);
+        interactSecondary.RemoveAllListeners(SteamVR_Input_Sources.Any);
+        move.RemoveAllListeners(SteamVR_Input_Sources.Any);
+        radialMenu.RemoveAllListeners(SteamVR_Input_Sources.Any);
+        toggleUI.RemoveAllListeners(SteamVR_Input_Sources.Any);
+        pause.RemoveAllListeners(SteamVR_Input_Sources.Any);
+    }
     
     public static bool InteractLaserPressed() {
         if (VRInputModule.Instance == null) return false;

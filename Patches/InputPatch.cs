@@ -196,20 +196,21 @@ public class InputPatch {
     // ===============
     #region OrcTouchingHand
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(OrcTouchingHand), "Start")]
+    [HarmonyPatch(typeof(OrcTouchingHand), "Awake")]
     private static void OrcTouchingHand_FollowController(OrcTouchingHand __instance) {
         // VRRig.OnReady(() => {
         //     __instance.orcHand.SetParent(VRRig.Instance.rigOffset, false);
         //     __instance.orcHand.localPosition = Vector3.zero;
         //     __instance.orcHand.localRotation = Quaternion.identity;
         // });
+        __instance.gameObject.AddComponent<VRHand>();
     }
     
     
     [HarmonyPrefix]
     [HarmonyPatch(typeof(OrcTouchingHand), "CheckMouse_New")]
     private static bool OrcTouchingHand_CheckMouse_New(OrcTouchingHand __instance) {
-        return true;
+        return false;
         
         // if (!Plugin.Config.vrInputEnabled) {
         //     return true; // use default implementation
@@ -222,13 +223,13 @@ public class InputPatch {
     }
 
 
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(OrcTouchingHand), "OrchHandPuppetMasterUpdate")]
-    private static bool OrcTouchingHand_PuppetMasterUpdate(OrcTouchingHand __instance) {
-        Transform controller = VRRig.Instance.rightController.transform;
-        __instance.PointTarget.position = controller.position;
-        __instance.PointTarget.rotation = controller.rotation;
-        return true;
-    }
+    // [HarmonyPrefix]
+    // [HarmonyPatch(typeof(OrcTouchingHand), "OrchHandPuppetMasterUpdate")]
+    // private static bool OrcTouchingHand_PuppetMasterUpdate(OrcTouchingHand __instance) {
+    //     Transform controller = VRRig.Instance.rightController.transform;
+    //     __instance.PointTarget.position = controller.position;
+    //     __instance.PointTarget.rotation = controller.rotation;
+    //     return true;
+    // }
     #endregion
 }

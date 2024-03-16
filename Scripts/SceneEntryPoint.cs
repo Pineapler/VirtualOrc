@@ -35,9 +35,8 @@ public class SceneEntryPoint : MonoBehaviour {
 
 
     public void AfterVrLoaded() {
-        Input.toggleUI.RemoveOnStateDownListener(OnToggleUI, SteamVR_Input_Sources.Any);
+        Input.UnsubscribeAllListeners();
         Input.toggleUI.AddOnStateDownListener(OnToggleUI, SteamVR_Input_Sources.Any);
-        Input.pause.RemoveOnStateDownListener(OnPause, SteamVR_Input_Sources.Any);
         Input.pause.AddOnStateDownListener(OnPause, SteamVR_Input_Sources.Any);
         
         InsertVrInputModule();

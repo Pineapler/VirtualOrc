@@ -53,6 +53,7 @@ public class UIPatch {
 
             var wsCanvasTools = canvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
             wsCanvasTools.EnableCollider = true;
+            wsCanvasTools.EnableLaser = true;
         });
 
     }
@@ -169,6 +170,7 @@ public class UIPatch {
             foreach (Transform child in canvas.transform) {
                 var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
                 wsCanvasTools.EnableCollider = true;
+                wsCanvasTools.EnableLaser = true;
             }
         });
     }
@@ -262,6 +264,7 @@ public class UIPatch {
             pauseBG.gameObject.SetActive(true);
             pauseWS.TargetRectTransform = pauseBG;
             pauseWS.EnableCollider = true;
+            pauseWS.EnableLaser = true;
 
             skipT.SetParent(holderT, false);
             skipCanvas.gameObject.SetLayerRecursive(LayerMask.NameToLayer("UI"));
@@ -273,6 +276,7 @@ public class UIPatch {
             skipT.localScale = Vector3.one;
             var skipWS = skipCanvas.gameObject.AddComponent<WorldSpaceCanvasTools>();
             skipWS.EnableCollider = true;
+            skipWS.EnableLaser = true;
         });
     }
 
@@ -305,6 +309,7 @@ public class UIPatch {
             foreach (Transform child in __instance.transform) {
                 var wsCanvasTools = child.gameObject.AddComponent<WorldSpaceCanvasTools>();
                 wsCanvasTools.EnableCollider = true;
+                wsCanvasTools.EnableLaser = true;
             }
         });
     }

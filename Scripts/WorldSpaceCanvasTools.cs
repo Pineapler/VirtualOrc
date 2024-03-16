@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace VirtualOrc.Scripts;
 
@@ -11,12 +13,13 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
     public BoxCollider boxCollider;
     private bool _enableCollider;
     private bool _isColliderAdded;
+    private bool _enableLaser;
 
     
     public bool EnableCollider {
         get => _enableCollider;
         set {
-            _enableCollider = true;
+            _enableCollider = value;
             if (value == false) {
                 if (boxCollider == null) return;
                 boxCollider.enabled = false;
@@ -37,6 +40,21 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
         }
     }
 
+    public bool EnableLaser {
+        get => _enableLaser;
+        set {
+            bool oldVal = _enableLaser;
+            _enableLaser = value;
+            if (gameObject.activeSelf) {
+                if (_enableLaser && !oldVal) {
+                    VRLaser.userCount += 1;
+                } else if (!_enableLaser && oldVal) {
+                    VRLaser.userCount -= 1;
+                }
+            }
+        }
+    }
+    
     private RectTransform _canvasRectTransform;
     public RectTransform TargetRectTransform {
         get {
@@ -86,6 +104,17 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
         TargetRectTransform.LookAt(VRRig.Instance.headsetCam.transform, Vector3.up);
     }
 
+    private void OnEnable() {
+        if (EnableLaser) {
+            VRLaser.userCount += 1;
+        }
+    }
+
+    private void OnDisable() {
+        if (EnableLaser) {
+            VRLaser.userCount -= 1;
+        }
+    }
 
     // private void PerspectiveScale() {
     //     if (!enablePerspectiveScale || VRRig.Instance == null) return;

@@ -18,7 +18,7 @@
 - [ ] Fix LogSystemManager properly. Currently disabled the UI so that it's not cluttering the screen.
 - [ ] Replace the missing fluid sim water with a vr-friendly alternative
 - [ ] "Return to menu" breaks user input
-  - SteamVR actions don't like the reload for some reason
+  - SteamVR actions don't like the reload for some reason, probably should add check if steamvr already initialized
 - [ ] Patch out WaterFiller (null ref from zibra liquids)
 - [ ] Pause menu layout is slightly messed up in world space.
   - volume sliders don't work - implement in VRInputModule
@@ -34,7 +34,6 @@
 ### Unity/BepInEx/Asset specific
 
 - [ ] Hook the SteamVR recentre event and apply our own `VrRig().Recentre`. Also do Y rotation.
-- [ ] Automatically copy SteamVR StreamingAssets to game directory
 
 # Complete
 
@@ -45,6 +44,7 @@
 - [X] Move main menu canvas to world space
 - [X] Move phone UI to world space
 - [X] Move client dialogue UI to world space
+- [X] Automatically copy SteamVR StreamingAssets to game directory
 
 # Notes
 

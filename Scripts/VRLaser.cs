@@ -6,6 +6,9 @@ using Valve.VR.Extras;
 namespace VirtualOrc.Scripts;
 
 public class VRLaser : MonoBehaviour {
+
+    public static int userCount;
+
     public Color laserColor = new (0.5f, 0.8f, 0.6f);
     public Color laserColorClick = new (0.7f, 0.9f, 0.8f);
     
@@ -17,21 +20,22 @@ public class VRLaser : MonoBehaviour {
     private void Awake() {
         pointer = gameObject.AddComponent<SteamVR_LaserPointer>();
     }
-    
+
     private IEnumerator Start() {
         yield return 0; // Wait for pointer to set itself up. Could implement custom logic instead.
         uiSelectAction = SteamVR_Actions._default.Interact;
-        
+
         pointer = gameObject.GetComponent<SteamVR_LaserPointer>();
         pointer.interactWithUI = uiSelectAction;
         pointer.color = laserColor;
         pointer.clickColor = laserColorClick;
-       
+
         // Change the InputModule to the hand that pressed trigger last
         uiSelectAction.RemoveOnStateDownListener(OnPointerClickNotEnabled, SteamVR_Input_Sources.LeftHand);
         uiSelectAction.AddOnStateDownListener(OnPointerClickNotEnabled, inputHand);
 
-        pointer.gameObject.SetActive(false);
+        pointer.pointer.gameObject.SetActive(false);
+        pointer.enabled = false;
 
         Material material = new Material(Shader.Find("Universal Render Pipeline/NiloToon/NiloToon_Environment"));
         pointer.pointer.GetComponent<MeshRenderer>().material = material;
@@ -43,5 +47,17 @@ public class VRLaser : MonoBehaviour {
         if (VRInputModule.Instance.activeLaser == this) return;
         
         VRInputModule.Instance.SetActiveLaser(this);
+    }
+
+    private void Update() {
+        if (VRInputModule.Instance == null) return;
+        if (userCount > 0 && !pointer.enabled && VRInputModule.Instance.activeLaser == this) {
+            pointer.pointer.gameObject.SetActive(true);
+            pointer.enabled = true;
+        }
+        else if (userCount <= 0 && pointer.enabled) {
+            pointer.pointer.gameObject.SetActive(false);
+            pointer.enabled = false;
+        }
     }
 }
