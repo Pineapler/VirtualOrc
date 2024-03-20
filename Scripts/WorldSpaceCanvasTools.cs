@@ -47,9 +47,9 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
             _enableLaser = value;
             if (gameObject.activeSelf) {
                 if (_enableLaser && !oldVal) {
-                    VRLaser.userCount += 1;
+                    VRLaser.AddUser();
                 } else if (!_enableLaser && oldVal) {
-                    VRLaser.userCount -= 1;
+                    VRLaser.RemoveUser();
                 }
             }
         }
@@ -106,13 +106,13 @@ public class WorldSpaceCanvasTools : MonoBehaviour {
 
     private void OnEnable() {
         if (EnableLaser) {
-            VRLaser.userCount += 1;
+            VRLaser.AddUser();
         }
     }
 
     private void OnDisable() {
         if (EnableLaser) {
-            VRLaser.userCount -= 1;
+            VRLaser.RemoveUser();
         }
     }
 

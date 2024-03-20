@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using HarmonyLib;
+﻿using HarmonyLib;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -15,7 +14,6 @@ public class GameSettingsPatch {
         
         urpAsset.shadowCascadeCount = 4;
         // why not public :( cmon unity
-        typeof(UniversalRenderPipelineAsset).GetField("m_Cascade4Split", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(urpAsset, new Vector3(0.01f, 0.02f, 0.04f));
+        TypeInfos.URP_Asset_M_Cascade4Split.SetValue(urpAsset, new Vector3(0.01f, 0.02f, 0.04f));
     }
 }

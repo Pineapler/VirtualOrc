@@ -1,9 +1,15 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using DG.Tweening;
 using HarmonyLib;
 using Kuro;
 using Pineapler.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using Valve.VR;
+using Valve.VR.InteractionSystem.Sample;
 using VirtualOrc.Scripts;
 using Input = VirtualOrc.Scripts.Input;
 
@@ -116,8 +122,6 @@ public class InputPatch {
     // MouseCursorManager
     // ==================
     #region MouseCursorManager
-    public static PropertyInfo mcm_hitProp;
-    public static PropertyInfo mcm_lastRaycastableProp;
     
     [HarmonyPrefix]
     [HarmonyPatch(typeof(MouseCursorManager), "MassageInput")]
@@ -125,12 +129,6 @@ public class InputPatch {
         Log.Info("MouseCursor MassageInput");
         if (VRInputModule.Instance == null || !VRInputModule.Instance.isLaserActive) return true;
         
-        Log.Info("Hello");
-
-        if (mcm_hitProp == null) {
-            mcm_hitProp = typeof(MouseCursorManager).GetProperty("hit", BindingFlags.NonPublic | BindingFlags.Instance)!;
-            mcm_lastRaycastableProp = typeof(MouseCursorManager).GetProperty("lastRaycastable", BindingFlags.Public | BindingFlags.Instance)!;
-        }
 
         Transform laserT = VRInputModule.Instance.activeLaser.transform;
         Ray ray = new Ray(laserT.position, laserT.forward);
@@ -138,7 +136,7 @@ public class InputPatch {
         if (Physics.Raycast(ray, out hitTemp, 100f, (int)__instance.mask) &&
             !EventSystem.current.IsPointerOverGameObject()) {
 
-            mcm_hitProp.SetValue(__instance, hitTemp);
+            TypeInfos.MouseCursorManager_Hit.SetValue(__instance, hitTemp);
 
             ISelectable component;
             if (!hitTemp.collider.TryGetComponent(out component)) {
@@ -148,7 +146,7 @@ public class InputPatch {
             if (__instance.lastRaycastable != null) {
                 __instance.lastRaycastable.Exit();
             }
-            mcm_lastRaycastableProp.SetValue(__instance, component);
+            TypeInfos.MouseCursorManager_LastRaycastable.SetValue(__instance, component);
             __instance.lastRaycastable!.Enter();
             
             MouseCursorManager.SwitchState(MouseCursorManager.MouseState.Hovering);
@@ -165,7 +163,7 @@ public class InputPatch {
             }
 
             __instance.lastRaycastable.Exit();
-            mcm_lastRaycastableProp.SetValue(__instance, null);
+            TypeInfos.MouseCursorManager_LastRaycastable.SetValue(__instance, null);
             MouseCursorManager.SwitchState(MouseCursorManager.MouseState.Normal);
         }
 
@@ -205,31 +203,25 @@ public class InputPatch {
         // });
         __instance.gameObject.AddComponent<VRHand>();
     }
-    
-    
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(OrcTouchingHand), "CheckMouse_New")]
-    private static bool OrcTouchingHand_CheckMouse_New(OrcTouchingHand __instance) {
-        return false;
-        
-        // if (!Plugin.Config.vrInputEnabled) {
-        //     return true; // use default implementation
-        // }
-        //
-        // // TODO: need to know which controller the hand is attached to
-        // bool isGrabbing = Input.interact.state;
-        //
-        // return false;
-    }
-
-
-    // [HarmonyPrefix]
-    // [HarmonyPatch(typeof(OrcTouchingHand), "OrchHandPuppetMasterUpdate")]
-    // private static bool OrcTouchingHand_PuppetMasterUpdate(OrcTouchingHand __instance) {
-    //     Transform controller = VRRig.Instance.rightController.transform;
-    //     __instance.PointTarget.position = controller.position;
-    //     __instance.PointTarget.rotation = controller.rotation;
-    //     return true;
-    // }
     #endregion
+
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(GMState_VipMassageEnd), "WaitForInput")]
+    private static bool GMState_VipMassageEnd_WaitForInputPatch(GMState_VipMassageEnd __instance) {
+        if (!Input.interact.GetState(SteamVR_Input_Sources.Any)) {
+            return false;
+        }
+
+        UnityAction temp = TypeInfos.GMState_VipMassageEnd_UpdateEvent.GetValue(__instance) as UnityAction;
+        temp -= __instance.WaitForInput;
+        TypeInfos.GMState_VipMassageEnd_UpdateEvent.SetValue(__instance, temp);
+
+        if (!NewGM.Instance.DebugMode) {
+            VipMassageGameSystem.Instance.resultUI.HideUI();
+            BodyStateStatus.Instance.analyzePanelUI.HideUI();
+        }
+        TalkManager.Instance.SetConverSation_New(GameManager.Instance.NowClient, ConverSationType.type.Exit, 0);
+        return false;
+    }
 }

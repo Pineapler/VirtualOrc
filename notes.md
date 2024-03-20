@@ -1,6 +1,5 @@
 ﻿# WIP
 
-- [ ] Parent orc hands to VR controllers, use these in massage games instead of laser
 - [ ] Controller laser interaction (partial)
 - [ ] Move full body massage targets UI to world space
 
@@ -12,6 +11,7 @@
   - Orbit
   - Free move?
 - [ ] Add an effect to hide the outside world while indoors
+- [ ] Laser should be hidden during loading screens (outside)
 
 ### Bugs 
 
@@ -22,8 +22,6 @@
 - [ ] Patch out WaterFiller (null ref from zibra liquids)
 - [ ] Pause menu layout is slightly messed up in world space.
   - volume sliders don't work - implement in VRInputModule
-- [ ] Selection rectangle on world space UI should lerp locally
-  - Phone UI
 
 ### UI
  
@@ -45,6 +43,7 @@
 - [X] Move phone UI to world space
 - [X] Move client dialogue UI to world space
 - [X] Automatically copy SteamVR StreamingAssets to game directory
+- [x] Parent orc hands to VR controllers, use these in massage games instead of laser
 
 # Notes
 

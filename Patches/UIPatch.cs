@@ -241,10 +241,9 @@ public class UIPatch {
     [HarmonyPostfix]
     [HarmonyPatch(typeof(OptionMenu), "Start")]
     private static void OptionMenu_ToWorldSpace(OptionMenu __instance) {
-        FieldInfo canvasField = typeof(OptionMenu).GetField("canvas", BindingFlags.Instance | BindingFlags.NonPublic)!;
 
         VRRig.OnReady(() => {
-            Canvas pauseCanvas = (canvasField.GetValue(__instance) as Canvas)!;
+            Canvas pauseCanvas = (TypeInfos.OptionMenu_Canvas.GetValue(__instance) as Canvas)!;
             Canvas skipCanvas = __instance.skipManga.GetComponent<Canvas>();
 
             Transform holderT = VRRig.Instance.canvasHolder.transform;
@@ -363,5 +362,15 @@ public class UIPatch {
         return false;
     }
 
+    #endregion
+    
+    #region Selectable UI
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(selectableBar), "UIOnEnter")]
+    private static bool SelectableBar_UIOnEnterPatch(selectableBar __instance, Transform target) {
+        __instance.selected.transform.DOLocalMoveY(target.localPosition.y, 0.1f);
+        return false;
+    }
     #endregion
 }

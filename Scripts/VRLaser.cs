@@ -7,7 +7,24 @@ namespace VirtualOrc.Scripts;
 
 public class VRLaser : MonoBehaviour {
 
-    public static int userCount;
+    private static int _userCount;
+    private static int _hiderCount;
+
+    public static void AddUser() {
+        _userCount += 1;
+    }
+    
+    public static void RemoveUser() {
+        _userCount -= 1;
+    }
+
+    public static void AddHider() {
+        _hiderCount += 1;
+    }
+    
+    public static void RemoveHider() {
+        _hiderCount -= 1;
+    }
 
     public Color laserColor = new (0.5f, 0.8f, 0.6f);
     public Color laserColorClick = new (0.7f, 0.9f, 0.8f);
@@ -51,13 +68,18 @@ public class VRLaser : MonoBehaviour {
 
     private void Update() {
         if (VRInputModule.Instance == null) return;
-        if (userCount > 0 && !pointer.enabled && VRInputModule.Instance.activeLaser == this) {
-            pointer.pointer.gameObject.SetActive(true);
-            pointer.enabled = true;
+
+        if (pointer.enabled) {
+            if (_hiderCount > 0 || _userCount <= 0 || VRInputModule.Instance.activeLaser != this) {
+                pointer.pointer.gameObject.SetActive(false);
+                pointer.enabled = false;
+            }
         }
-        else if (userCount <= 0 && pointer.enabled) {
-            pointer.pointer.gameObject.SetActive(false);
-            pointer.enabled = false;
+        else {
+            if (_hiderCount <= 0 && _userCount > 0 && VRInputModule.Instance.activeLaser == this) {
+                pointer.pointer.gameObject.SetActive(true);
+                pointer.enabled = true;
+            }
         }
     }
 }
