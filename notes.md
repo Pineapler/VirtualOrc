@@ -12,14 +12,15 @@
   - Free move?
 - [ ] Add an effect to hide the outside world while indoors
 - [ ] Laser should be hidden during loading screens (outside)
+- [ ] Lock horizon (option to disable)
 
 ### Bugs 
 
 - [ ] Fix LogSystemManager properly. Currently disabled the UI so that it's not cluttering the screen.
+- [ ] Patch out WaterFiller (null ref from zibra liquids)
 - [ ] Replace the missing fluid sim water with a vr-friendly alternative
 - [ ] "Return to menu" breaks user input
   - SteamVR actions don't like the reload for some reason, probably should add check if steamvr already initialized
-- [ ] Patch out WaterFiller (null ref from zibra liquids)
 - [ ] Pause menu layout is slightly messed up in world space.
   - volume sliders don't work - implement in VRInputModule
 
@@ -27,7 +28,6 @@
  
 - [ ] Move computer UI to world space
 - [ ] Add fade effect to full camera
-- [ ] Configure laser context stack pushes/pops (when is a laser pointer needed?)
 
 ### Unity/BepInEx/Asset specific
 

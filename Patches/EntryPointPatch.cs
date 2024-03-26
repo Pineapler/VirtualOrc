@@ -29,6 +29,10 @@ public class EntryPointPatch {
         else {
             Log.Info("  Entry point already exists");
         }
+
+        if (DebugShape.material == null) {
+            DebugShape.material = new Material(Shader.Find("Universal Render Pipeline/NiloToon/NiloToon_Environment"));
+        }
         
     }
     

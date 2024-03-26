@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using DG.Tweening;
 using HarmonyLib;
+using Pineapler.Utils;
 using UnityEngine;
 using Valve.VR;
 using VirtualOrc.Scripts;
@@ -10,6 +11,7 @@ namespace VirtualOrc.Patches;
 
 [HarmonyPatch]
 public static class MinigamePatch {
+    private static bool DEBUG_RAYCAST = false;
     
     [HarmonyPrefix]
     [HarmonyPatch(typeof(OrcTouchingHand), "CheckMouse_New")]
@@ -84,7 +86,13 @@ public static class MinigamePatch {
     private static bool HandCast(OrcTouchingHand __instance) {
         VRHand hand = VRHand.Instance;
         Transform t = hand.orcHand.transform;
-        Ray ray = new Ray(t.position + hand.raycastOffset, t.forward);
+        Vector3 rayOrigin = t.TransformPoint(hand.raycastOffset);
+        Ray ray = new Ray(rayOrigin, t.forward);
+        
+        if (DEBUG_RAYCAST) {
+            DebugShape.DrawRay(ray, hand.raycastDistance, hand.spherecastRadius);
+        }
+        
         if (Physics.SphereCast(ray, hand.spherecastRadius, out RaycastHit hit, hand.raycastDistance, __instance.raycastSystem.detectLayerMask)) {
             __instance.raycastSystem.selectedHit = hit;
             

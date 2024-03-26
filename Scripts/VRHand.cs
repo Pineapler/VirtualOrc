@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Pineapler.Utils;
+using UnityEngine;
 
 namespace VirtualOrc.Scripts;
 
@@ -9,13 +10,12 @@ public class VRHand : MonoBehaviour {
     public OrcTouchingHand touchingHand;
     public Transform orcHand;
     public Transform tracker;
-    public Vector3 handOffsetPosition = new Vector3(0, -.02f, -0.07f);
+    public Vector3 handOffsetPosition = new (0, -0.02f, -0.07f);
     public Quaternion handOffsetRotation = Quaternion.Euler(30, 320, 280);
 
-    // public Vector3 raycastOffset = new (0, 0, );
-    public Vector3 raycastOffset = new (0, 0, -0.1f);
-    public float raycastDistance = 0.1f;
-    public float spherecastRadius = 0.02f;
+    public Vector3 raycastOffset = new (0, 0, -0.07f);
+    public float raycastDistance = 0.05f;
+    public float spherecastRadius = 0.04f;
 
     private void Awake() {
         if (Instance != null) {
