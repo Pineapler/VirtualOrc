@@ -1,0 +1,65 @@
+﻿name: Package BepInEx mod
+
+# This workflow performs the following tasks:
+#   - Set up dotnet and build dependencies
+#   - Update version in plugin.cs to match the commit tag
+#   - Compile and package the plugin
+#   - Create a Release draft containing the packaged plugin
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build:
+    permissions:
+      contents: write
+      
+    runs-on: windows-latest
+   
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+      PLUGIN: VirtualOrc
+      
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+          cache: true
+      
+      - run: dotnet restore --locked-mode
+      
+      - name: Prepare environment
+        id: prepare_env
+        run: |
+          $VERSION="${{ github.ref_name }}".substring(1)
+          $env:PATH += ";C:\Program Files\Git\usr\bin"
+          mkdir -p staging\plugins\$env:PLUGIN\
+          mkdir -p publish\
+      
+      - name: Build mod
+        id: build_mod
+        run: |
+          sed -i 's/0\.0\.0/$VERSION/' $env:PLUGIN/plugin.cs
+          dotnet build
+          cp bin\Debug\netstandard2.1\$env:PLUGIN.dll staging\plugins\$env:PLUGIN\$env:PLUGIN.dll
+          If (Test-Path .\RuntimeDeps) { cp -r .\RuntimeDeps .\staging\plugins\$env:PLUGIN\ }
+          cp -r .\StreamingAssets .\staging\plugins\$env:PLUGIN\
+      
+      - name: Zip package
+        id: zip
+        run: |
+          Compress-Archive -Path staging\* -DestinationPath publish\$env:PLUGIN.zip
+      
+      - name: GitHub release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: true
+          files: publish/*.zip
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
